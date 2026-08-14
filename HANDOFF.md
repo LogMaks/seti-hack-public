@@ -37,6 +37,8 @@ seti-hack-organizer/   ← отдельный приватный корень / 
 | DST | классический Dempster |
 | Baselines | majority · mean BPA · DST |
 | HITL | K / m(Θ) / Bel → DECIDE \| HUMAN_REVIEW \| OBSERVE_MORE |
+| Канон | DST на team-mean A vs B; все 6 детекторов — диагностика |
+| K→1 | комбинация отказана → HUMAN_REVIEW, не traceback |
 | S2 | объяснимый структурированный сигнал, не третий класс в коде |
 | Spectrogram на сайте | не нужен в MVP |
 | Конфликт | искать кейс, где majority/mean «спокойны», а DST поднимает K / ведёт в HUMAN_REVIEW — не обещать это на каждом файле |
@@ -62,10 +64,13 @@ python main.py data/example_sine.npy
 ```
 
 ### `website/`
-- ARRAY-7 terminal: waveform, download `.npy`, status UNCLASSIFIED
-- Деплой Pages: `.github/workflows/pages.yml` (артефакт = папка `website/`)
-- Выдача раундов: `website/data/catalog.json` → поле `released`
-- `?all=1` — показать все observations
+- ARRAY-7: waveform, Play audio, download `.npy`, status UNCLASSIFIED
+- Pages: `.github/workflows/pages.yml` (артефакт = `website/`)
+- `released` прячет пункт в UI, **не** прячет файл. Живой хак: не пушить будущие `.npy`
+- `?all=1` — отладка организатора
+
+### `materials/`
+- `INTRO.md`, `TEAM_A.md`, `TEAM_B.md`, `DST_CHEATSHEET.md`
 
 ```bash
 cd website && python3 -m http.server 8765
@@ -75,9 +80,9 @@ cd website && python3 -m http.server 8765
 
 ## 5. Следующий приоритет
 
-1. `materials/INTRO.md`, `TEAM_A.md`, `TEAM_B.md`, `DST_CHEATSHEET.md`
-2. Перед живым хаком: `released:true` только у текущего раунда
-3. После перегенерации в organizer — снова копировать только `obs_s*.npy/json` в `website/data/`
+1. Перед живым хаком: не держать будущие `obs_s*.npy` в Pages; `released:true` только у текущего раунда
+2. Pre-flight: `main.py` на каждом obs — найти хотя бы один кейс «majority спокоен, DST поднимает K»
+3. После перегенерации в organizer — копировать в `website/data/` только public `obs_s*`
 4. Не добавлять FastAPI/Docker/тяжёлые DST-frameworks / Θ из трёх гипотез без отдельного решения
 
 ---
@@ -97,7 +102,7 @@ cd website && python3 -m http.server 8765
 Продолжаем SETI/DST Hack.
 Сначала прочитай HANDOFF.md в корне seti-hack-public и .cursor/rules если есть.
 Public repo: participant + website. Organizer-секреты не выдумывать и не коммитить сюда.
-Сейчас нужно: [например materials/INTRO+TEAM_A+TEAM_B+DST_CHEATSHEET].
+Сейчас нужно: [например pre-flight baseline на всех obs / процедура выдачи раундов].
 Не усложнять стек. Отвечай по-русски.
 ```
 

@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
 """
-Single-observation experiment pipeline.
+One observation: load → A/B detectors → majority / mean / DST → HITL.
 
-    load → Team A detectors → Team B detectors
-         → majority / mean / DST
-         → HITL policy → optional human input
+Canon: DST on team-mean A vs team-mean B. All-6 detectors are diagnostics.
 
-Usage:
     python generator_example.py
     python main.py data/example_noise.npy
-    python main.py data/example_sine.npy
     python main.py data/example_sine.npy --human
 """
 
@@ -26,16 +22,28 @@ from io_utils import load_observation
 
 
 def _fmt_bpa(m: dict) -> str:
-    return (
-        f"signal={m['signal']:.3f}  noise={m['noise']:.3f}  "
-        f"unknown={m['unknown']:.3f}"
-    )
+    return f"signal={m['signal']:.3f}  noise={m['noise']:.3f}  unknown={m['unknown']:.3f}"
+
+
+def _fmt_dst(dst: dict) -> str:
+    k = dst["max_conflict"]
+    if dst.get("refused") or dst["mass"] is None:
+        return f"refused  K={k:.3f}"
+    return f"{dst['decision']}  {_fmt_bpa(dst['mass'])}  K={k:.3f}"
+
+
+def _print_baselines(title: str, report: dict, votes: bool = False) -> None:
+    print(f"\n--- {title} ---")
+    extra = f"  {report['majority']['votes']}" if votes else ""
+    print(f"  majority → {report['majority']['decision']}{extra}")
+    print(f"  mean     → {report['mean']['decision']}  {_fmt_bpa(report['mean']['mass'])}")
+    print(f"  DST      → {_fmt_dst(report['dst'])}")
+    print(f"  policy   → {report['policy']}")
 
 
 def analyze(path: Path, ask_human: bool = False) -> dict:
     x, meta = load_observation(path)
     fs = float(meta.get("fs", 8000.0))
-
     bpa_a = run_team_a(x, fs)
     bpa_b = run_team_b(x, fs)
 
@@ -43,47 +51,28 @@ def analyze(path: Path, ask_human: bool = False) -> dict:
     print("\n--- Team A (spectral) ---")
     for name, m in zip(DETECTOR_NAMES_A, bpa_a):
         print(f"  {name:12s}  {_fmt_bpa(m)}")
-
     print("\n--- Team B (structure) ---")
     for name, m in zip(DETECTOR_NAMES_B, bpa_b):
         print(f"  {name:12s}  {_fmt_bpa(m)}")
 
-    # Team-level summaries (mean BPA), then fuse the two teams with DST
-    team_a = mean_bpa(bpa_a)
-    team_b = mean_bpa(bpa_b)
+    team_a, team_b = mean_bpa(bpa_a), mean_bpa(bpa_b)
     print("\n--- Team means ---")
     print(f"  A mean       {_fmt_bpa(team_a)}")
     print(f"  B mean       {_fmt_bpa(team_b)}")
 
-    # Compare baselines on: all detectors + on the two team means
-    all_masses = bpa_a + bpa_b
-    report_all = compare_baselines(all_masses)
     report_teams = compare_baselines([team_a, team_b])
+    report_all = compare_baselines(bpa_a + bpa_b)
+    _print_baselines("Canon: DST on team means (A vs B)", report_teams)
+    _print_baselines("Diagnostics: all 6 detectors", report_all, votes=True)
 
-    print("\n--- Baselines on all 6 detectors ---")
-    print(f"  majority → {report_all['majority']['decision']}  {report_all['majority']['votes']}")
-    print(f"  mean     → {report_all['mean']['decision']}  {_fmt_bpa(report_all['mean']['mass'])}")
-    print(
-        f"  DST      → {report_all['dst']['decision']}  "
-        f"{_fmt_bpa(report_all['dst']['mass'])}  "
-        f"maxK={report_all['dst']['max_conflict']:.3f}"
-    )
-    print(f"  policy   → {report_all['policy']}")
-
-    print("\n--- Baselines on team means (A vs B) ---")
-    print(f"  majority → {report_teams['majority']['decision']}")
-    print(f"  mean     → {report_teams['mean']['decision']}  {_fmt_bpa(report_teams['mean']['mass'])}")
-    print(
-        f"  DST      → {report_teams['dst']['decision']}  "
-        f"{_fmt_bpa(report_teams['dst']['mass'])}  "
-        f"K={report_teams['dst']['max_conflict']:.3f}"
-    )
-    print(f"  policy   → {report_teams['policy']}")
-
-    summary = summarize(report_teams["dst"]["mass"])
-    print("\n--- Bel / Pl (team-level DST) ---")
-    print(f"  Bel {summary['belief']}")
-    print(f"  Pl  {summary['plausibility']}")
+    fused = report_teams["dst"]["mass"]
+    if fused is not None:
+        s = summarize(fused)
+        print("\n--- Bel / Pl (canon DST) ---")
+        print(f"  Bel {s['belief']}")
+        print(f"  Pl  {s['plausibility']}")
+    else:
+        print("\n--- Bel / Pl --- combination refused (total conflict)")
 
     human = None
     if ask_human:

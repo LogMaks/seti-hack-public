@@ -1,9 +1,9 @@
 # SETI / DST Hack — participant kit
 
-Неизвестный зашумлённый сигнал. Две команды извлекают evidence, объединяют его через Dempster–Shafer (DST) и принимают решение — в том числе *воздержаться* или передать человеку.
+Неизвестный зашумлённый сигнал. Две команды извлекают evidence, сливают через Dempster–Shafer и решают — в том числе воздержаться или отдать человеку.
 
-Главный вопрос хака: **какова природа наблюдения при неполных и противоречивых свидетельствах?**  
-Расшифровка скрытых структур — необязательный бонус, не цель baseline.
+Главный вопрос: **какова природа наблюдения при неполных и противоречивых свидетельствах?**  
+Расшифровка скрытых структур — бонус, не цель baseline.
 
 ## Быстрый старт (~10 минут)
 
@@ -12,98 +12,39 @@ cd participant
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-
 python generator_example.py
 python main.py data/example_noise.npy
 python main.py data/example_sine.npy
 ```
 
-Ожидайте: для `example_noise` политика чаще уходит в шум / review / observe; для `example_sine` — согласие детекторов на `signal`.
+Брифинги: [`../materials/INTRO.md`](../materials/INTRO.md).
+
+## Канон
+
+Θ = {signal, noise}. `unknown` в BPA — это **m(Θ)**, не третий класс.
+
+1. Team A / Team B → свои BPA (`detectors_a.py` / `detectors_b.py`).  
+2. Внутри команды — mean BPA.  
+3. **Сдача:** majority · mean · DST на двух team means (A vs B), плюс Bel / Pl / K / политика.  
+4. Все 6 детекторов в выводе `main.py` — диагностика.
+
+При K → 1 комбинация отказана, политика → `HUMAN_REVIEW` (не traceback).  
+`max K` — максимум последовательных pairwise K, учебный прокси.
+
+Ищите случаи, где majority/mean спокойны, а DST поднимает K — не на каждом файле.
 
 ## Pipeline
 
 ```text
-observation (.npy)
-      ↓
-Team A: FFT / PSD / SNR          Team B: autocorr / entropy / periodicity
-      ↓                                    ↓
-     BPA                                  BPA
-      └──────────────┬─────────────────────┘
-                     ↓
-         majority | mean score | DST
-                     ↓
-         Bel / Pl / conflict K / m(Θ)
-                     ↓
-         DECIDE | HUMAN_REVIEW | OBSERVE_MORE
+.npy → A: SNR/FFT/band     B: autocorr/entropy/periodicity
+         BPA                      BPA
+              mean A  +  mean B  →  majority | mean | DST
+                                  Bel / Pl / K / m(Θ)
+                                  DECIDE | HUMAN_REVIEW | OBSERVE_MORE
 ```
 
-## Пространство гипотез (DST)
+`OBSERVE_MORE` = ждать следующий раунд, отдельного API нет. HITL: `python main.py FILE --human`.
 
-Бинарный frame:
+Пороги, признаки, score→BPA можно менять; метод нужно объяснить. ИИ разрешён, ground truth не выдаёт.
 
-```text
-Θ = {signal, noise}
-```
-
-Каждый детектор отдаёт basic probability assignment:
-
-```python
-{"signal": 0.60, "noise": 0.15, "unknown": 0.25}  # sum == 1
-```
-
-`unknown` — это **m(Θ)** (масса незнания), не третий класс.
-
-Модуль `dst.py`: `validate_bpa`, `belief`, `plausibility`, `conflict`, `combine` (правило Демпстера).
-
-## Две команды
-
-| Команда | Вопрос | Файлы |
-|--------|--------|--------|
-| **A** | Есть ли физически выделяемый сигнал? | `detectors_a.py` |
-| **B** | Есть ли неслучайная структура? | `detectors_b.py` |
-
-Можно менять пороги, добавлять признаки, переписывать отображение score→BPA. Нужно уметь объяснить метод и результат.
-
-## Baseline для сравнения
-
-На одном и том же наборе BPA `decision.py` считает:
-
-1. **majority** — голоса hard-label  
-2. **mean score** — среднее BPA  
-3. **DST** — комбинация Демпстера  
-
-Плюс простая HITL-политика по `K`, `m(Θ)`, `Bel`.
-
-Имеет смысл искать (и обсуждать) случаи, где majority/mean выглядят «спокойно», а DST подсвечивает высокий конфликт `K` или большое незнание `m(Θ)`. Это не обязано случаться на каждом файле — это исследовательский критерий.
-
-## AI-assisted development
-
-Использование Cursor, ChatGPT и других ИИ-инструментов **разрешено**. Их можно применять для разбора кода, реализации методов, визуализации и проверки гипотез. Команда должна понимать метод и уметь объяснить результат. ИИ — инструмент разработки, не источник ground truth.
-
-## Структура
-
-```text
-participant/
-├── main.py                 # один прогон
-├── detectors_a.py          # спектральные baseline
-├── detectors_b.py          # структурные baseline
-├── dst.py                  # DST
-├── decision.py             # majority / mean / DST + HITL
-├── io_utils.py             # load/save .npy (+ json)
-├── generator_example.py    # toy noise / sine
-├── requirements.txt
-├── data/                   # кладите скачанные наблюдения
-└── README.md
-```
-
-Зависимости: Python 3.10+, NumPy, SciPy, Matplotlib.
-
-## Что сдать по observation
-
-- BPA детекторов (или team means)  
-- сравнение majority / mean / DST  
-- Bel, Pl, K, m(Θ)  
-- действие политики и (если было) решение человека  
-- 3–5 предложений обоснования  
-
-Подробные брифинги команд — в материалах мероприятия (`TEAM_A.md` / `TEAM_B.md`), когда их выдаст организатор.
+Зависимости: Python 3.10+, NumPy, SciPy, Matplotlib. Скачанные наблюдения — в `data/`.

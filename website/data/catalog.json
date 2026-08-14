@@ -2,7 +2,7 @@
   "station_id": "ARRAY-7",
   "station_name": "ARRAY-7 Listening Post",
   "tagline": "Deep-sky transient desk",
-  "note": "During the live event, set released=false for future rounds. For local demo all may be true.",
+  "note": "released hides a row in the UI only; files in data/ stay fetchable. Live event: do not commit future obs_s*.npy until that round. Local demo may set all released=true.",
   "observations": [
     {
       "id": "obs_s0",

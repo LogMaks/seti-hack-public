@@ -7,13 +7,16 @@
 ```text
 seti-hack-public/
 ├── participant/     # Python baseline
-└── website/         # ARRAY-7 observation terminal (static)
+├── website/         # ARRAY-7 observation terminal (static)
+└── materials/       # INTRO, TEAM_A/B, DST cheatsheet
 ```
 
 ## Participant
 
 ```bash
 cd participant
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 python generator_example.py
 python main.py data/example_noise.npy

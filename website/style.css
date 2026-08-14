@@ -113,7 +113,7 @@ body {
 
 .select-row {
   display: grid;
-  grid-template-columns: minmax(12rem, 1.2fr) auto auto;
+  grid-template-columns: minmax(12rem, 1.2fr) auto auto auto;
   gap: 1rem;
   align-items: end;
   animation: rise 850ms ease-out both;
@@ -175,18 +175,35 @@ select:focus {
   text-decoration: none;
   color: var(--bg0);
   background: var(--accent);
+  font: inherit;
   font-weight: 600;
   font-size: 0.82rem;
   letter-spacing: 0.04em;
+  border: 1px solid transparent;
   border-radius: 2px;
+  cursor: pointer;
+  white-space: nowrap;
   transition: transform 160ms ease, filter 160ms ease;
 }
 
-.btn:hover {
+.btn-ghost {
+  color: var(--accent);
+  background: transparent;
+  border-color: var(--accent);
+}
+
+.btn-ghost.is-playing {
+  color: var(--bg0);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn:hover:not(:disabled) {
   transform: translateY(-1px);
   filter: brightness(1.05);
 }
 
+.btn:disabled,
 .btn.is-disabled {
   pointer-events: none;
   opacity: 0.4;

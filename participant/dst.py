@@ -3,12 +3,8 @@ Minimal Dempster–Shafer Theory for a binary frame of discernment.
 
     Θ = {signal, noise}
 
-A basic probability assignment (BPA) is a dict:
-
-    {"signal": m({signal}), "noise": m({noise}), "unknown": m(Θ)}
-
-with non-negative masses that sum to 1.
-"unknown" is ignorance mass on the whole frame — not a third class.
+BPA: {"signal": m({signal}), "noise": m({noise}), "unknown": m(Θ)}
+"unknown" is ignorance on the whole frame — not a third class.
 """
 
 from __future__ import annotations
@@ -19,8 +15,15 @@ from typing import Iterable
 HYPOTHESES = ("signal", "noise")
 
 
+class TotalConflict(ValueError):
+    """Dempster combination is undefined when K → 1."""
+
+    def __init__(self, k: float):
+        self.k = float(k)
+        super().__init__(f"total conflict K={self.k:.6f}; refuse to combine")
+
+
 def validate_bpa(m: dict) -> dict:
-    """Return a normalized copy; raise if keys/masses are invalid."""
     required = {"signal", "noise", "unknown"}
     if set(m) != required:
         raise ValueError(f"BPA keys must be exactly {required}, got {set(m)}")
@@ -30,7 +33,6 @@ def validate_bpa(m: dict) -> dict:
     s = sum(vals.values())
     if abs(s - 1.0) > 1e-6:
         raise ValueError(f"masses must sum to 1, got {s}")
-    # tiny numerical cleanup
     vals["unknown"] = 1.0 - vals["signal"] - vals["noise"]
     return vals
 
@@ -57,17 +59,11 @@ def conflict(m1: dict, m2: dict) -> float:
 
 
 def combine(m1: dict, m2: dict) -> tuple[dict, float]:
-    """
-    Dempster's rule for two BPAs.
-
-    Returns (combined_bpa, conflict_K).
-    If K → 1, combination is ill-conditioned (strong contradiction).
-    """
+    """Dempster's rule. Returns (combined_bpa, K). Raises TotalConflict if K → 1."""
     a, b = validate_bpa(m1), validate_bpa(m2)
     k = a["signal"] * b["noise"] + a["noise"] * b["signal"]
     if k >= 1.0 - 1e-12:
-        # Total conflict: keep raw product masses unnormalized marker
-        raise ValueError(f"total conflict K={k:.6f}; refuse to combine")
+        raise TotalConflict(k)
 
     norm = 1.0 - k
     signal = (a["signal"] * b["signal"] + a["signal"] * b["unknown"] + a["unknown"] * b["signal"]) / norm
@@ -77,7 +73,7 @@ def combine(m1: dict, m2: dict) -> tuple[dict, float]:
 
 
 def combine_many(masses: Iterable[dict]) -> tuple[dict, list[float]]:
-    """Sequentially combine BPAs; returns (fused, list of pairwise K)."""
+    """Sequential Dempster; returns (fused, pairwise K). K list depends on order."""
     masses = list(masses)
     if not masses:
         raise ValueError("empty mass list")
@@ -105,8 +101,5 @@ def mean_bpa(masses: Iterable[dict]) -> dict:
 
 
 def summarize(m: dict) -> dict:
-    """Handy bundle for printing / reports."""
     m = validate_bpa(m)
-    bel = belief(m)
-    pl = plausibility(m)
-    return {"mass": m, "belief": bel, "plausibility": pl}
+    return {"mass": m, "belief": belief(m), "plausibility": plausibility(m)}

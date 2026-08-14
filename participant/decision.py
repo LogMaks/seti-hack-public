@@ -1,31 +1,22 @@
 """
-Decision baselines and a tiny Human-in-the-Loop policy.
+Baselines + HITL. Canon fusion is team-mean A vs B (see main.py).
 
-Baselines (for comparison on the same observation):
-  - majority voting on hard labels from BPAs
-  - mean / averaged score
-  - DST fusion (Dempster)
-
-Policy after fusion:
-  high conflict or high ignorance → HUMAN_REVIEW
-  weak belief → OBSERVE_MORE / ABSTAIN
-  otherwise → DECIDE(signal|noise)
+majority / mean score / Dempster, then:
+  high K or high m(Θ) → HUMAN_REVIEW
+  weak / tied belief → OBSERVE_MORE
+  else → DECIDE(signal|noise)
 """
 
 from __future__ import annotations
 
-from dst import belief, combine_many, mean_bpa, plausibility, validate_bpa
+from dst import TotalConflict, belief, combine_many, mean_bpa, plausibility, validate_bpa
 
-
-# Tunable thresholds — change them; defend your choice.
 TAU_CONFLICT = 0.25
 TAU_UNKNOWN = 0.40
 TAU_BELIEF = 0.55
 
 
-def hard_label(m: dict) -> str:
-    """Map one BPA to a hard class using belief; ties → abstain."""
-    m = validate_bpa(m)
+def _argmax_bel(m: dict) -> str:
     bel = belief(m)
     if bel["signal"] > bel["noise"]:
         return "signal"
@@ -34,90 +25,82 @@ def hard_label(m: dict) -> str:
     return "abstain"
 
 
+def hard_label(m: dict) -> str:
+    return _argmax_bel(validate_bpa(m))
+
+
 def majority_vote(masses: list[dict]) -> dict:
-    """Count hard labels; returns a simple report dict."""
-    labels = [hard_label(m) for m in masses]
     counts = {"signal": 0, "noise": 0, "abstain": 0}
-    for lab in labels:
-        counts[lab] += 1
-    decisive = {k: counts[k] for k in ("signal", "noise")}
-    if decisive["signal"] == decisive["noise"]:
+    for m in masses:
+        counts[hard_label(m)] += 1
+    if counts["signal"] == counts["noise"]:
         winner = "abstain"
     else:
-        winner = max(decisive, key=decisive.get)
+        winner = "signal" if counts["signal"] > counts["noise"] else "noise"
     return {"method": "majority", "votes": counts, "decision": winner}
 
 
 def mean_score(masses: list[dict]) -> dict:
-    """Average BPAs, then pick argmax belief."""
     m = mean_bpa(masses)
-    bel = belief(m)
-    if bel["signal"] > bel["noise"]:
-        decision = "signal"
-    elif bel["noise"] > bel["signal"]:
-        decision = "noise"
-    else:
-        decision = "abstain"
     return {
         "method": "mean_score",
         "mass": m,
-        "belief": bel,
+        "belief": belief(m),
         "plausibility": plausibility(m),
-        "decision": decision,
+        "decision": _argmax_bel(m),
     }
 
 
 def dst_fusion(masses: list[dict]) -> dict:
-    """Dempster combination of all BPAs."""
-    fused, ks = combine_many(masses)
-    bel = belief(fused)
-    if bel["signal"] > bel["noise"]:
-        decision = "signal"
-    elif bel["noise"] > bel["signal"]:
-        decision = "noise"
-    else:
-        decision = "abstain"
+    try:
+        fused, ks = combine_many(masses)
+    except TotalConflict as e:
+        return {
+            "method": "dst",
+            "mass": None,
+            "belief": None,
+            "plausibility": None,
+            "pairwise_conflict": [],
+            "max_conflict": e.k,
+            "decision": "abstain",
+            "refused": True,
+        }
     return {
         "method": "dst",
         "mass": fused,
-        "belief": bel,
+        "belief": belief(fused),
         "plausibility": plausibility(fused),
         "pairwise_conflict": ks,
         "max_conflict": max(ks) if ks else 0.0,
-        "decision": decision,
+        "decision": _argmax_bel(fused),
+        "refused": False,
     }
 
 
 def hitl_policy(fused: dict, max_conflict: float = 0.0) -> dict:
-    """
-    Simple post-fusion policy.
-
-    Returns action in {DECIDE, HUMAN_REVIEW, OBSERVE_MORE} and optional label.
-    """
-    m = validate_bpa(fused["mass"] if "mass" in fused else fused)
-    bel = belief(m)
-
-    if max_conflict >= TAU_CONFLICT:
+    if fused.get("refused") or max_conflict >= TAU_CONFLICT:
         return {
             "action": "HUMAN_REVIEW",
             "reason": f"conflict K={max_conflict:.3f} ≥ {TAU_CONFLICT}",
             "label": None,
         }
+    m = validate_bpa(fused["mass"] if "mass" in fused else fused)
+    bel = belief(m)
     if m["unknown"] >= TAU_UNKNOWN:
         return {
             "action": "HUMAN_REVIEW",
             "reason": f"m(Θ)={m['unknown']:.3f} ≥ {TAU_UNKNOWN}",
             "label": None,
         }
-
-    winner = "signal" if bel["signal"] >= bel["noise"] else "noise"
+    winner = _argmax_bel(m)
+    if winner == "abstain":
+        return {"action": "OBSERVE_MORE", "reason": "Bel(signal) = Bel(noise)", "label": None}
     if bel[winner] >= TAU_BELIEF:
         return {
             "action": "DECIDE",
             "reason": f"Bel({winner})={bel[winner]:.3f} ≥ {TAU_BELIEF}",
             "label": winner,
         }
-
     return {
         "action": "OBSERVE_MORE",
         "reason": f"Bel({winner})={bel[winner]:.3f} < {TAU_BELIEF}",
@@ -126,19 +109,16 @@ def hitl_policy(fused: dict, max_conflict: float = 0.0) -> dict:
 
 
 def compare_baselines(masses: list[dict]) -> dict:
-    """Run majority, mean, and DST on the same list of BPAs."""
-    maj = majority_vote(masses)
-    mean = mean_score(masses)
     dst = dst_fusion(masses)
-    policy = hitl_policy(dst, max_conflict=dst["max_conflict"])
-    return {"majority": maj, "mean": mean, "dst": dst, "policy": policy}
+    return {
+        "majority": majority_vote(masses),
+        "mean": mean_score(masses),
+        "dst": dst,
+        "policy": hitl_policy(dst, max_conflict=dst["max_conflict"]),
+    }
 
 
 def human_review_prompt(obs_id: str, report: dict) -> str | None:
-    """
-    Minimal HITL interface: print context, ask for a decision.
-    Returns 'signal', 'noise', 'abstain', or None if skipped / non-interactive.
-    """
     print("\n=== HUMAN REVIEW ===")
     print(f"observation: {obs_id}")
     print(f"policy:      {report['policy']}")
@@ -149,6 +129,4 @@ def human_review_prompt(obs_id: str, report: dict) -> str | None:
         ans = input("Your decision [signal/noise/abstain/skip]: ").strip().lower()
     except EOFError:
         return None
-    if ans in {"signal", "noise", "abstain"}:
-        return ans
-    return None
+    return ans if ans in {"signal", "noise", "abstain"} else None

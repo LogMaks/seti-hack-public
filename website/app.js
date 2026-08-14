@@ -5,6 +5,7 @@ const catalogUrl = "data/catalog.json";
 const els = {
   select: document.getElementById("obs-select"),
   status: document.getElementById("status-badge"),
+  play: document.getElementById("play-btn"),
   download: document.getElementById("download-btn"),
   title: document.getElementById("obs-title"),
   meta: document.getElementById("obs-meta"),
@@ -14,6 +15,10 @@ const els = {
 
 let catalog = null;
 let drawToken = 0;
+let currentSamples = null;
+let currentFs = 8000;
+let audioCtx = null;
+let audioSource = null;
 
 function tickClock() {
   const now = new Date();
@@ -123,8 +128,80 @@ function drawWaveform(samples) {
   ctx.stroke();
 }
 
+function setPlayUi(playing) {
+  if (!els.play) return;
+  els.play.textContent = playing ? "Stop audio" : "Play audio";
+  els.play.classList.toggle("is-playing", playing);
+  els.play.setAttribute("aria-pressed", playing ? "true" : "false");
+}
+
+function stopAudio() {
+  if (audioSource) {
+    audioSource.onended = null;
+    try {
+      audioSource.stop();
+    } catch {
+      /* already stopped */
+    }
+    audioSource.disconnect();
+    audioSource = null;
+  }
+  setPlayUi(false);
+}
+
+function peakNormalize(samples, peak = 0.85) {
+  let maxAbs = 0;
+  for (let i = 0; i < samples.length; i++) {
+    const a = Math.abs(samples[i]);
+    if (a > maxAbs) maxAbs = a;
+  }
+  const gain = maxAbs > 1e-9 ? peak / maxAbs : 0;
+  const out = new Float32Array(samples.length);
+  for (let i = 0; i < samples.length; i++) out[i] = samples[i] * gain;
+  return out;
+}
+
+async function togglePlay() {
+  if (audioSource) {
+    stopAudio();
+    return;
+  }
+  if (!currentSamples || !currentSamples.length) return;
+
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) {
+    els.play.disabled = true;
+    els.play.textContent = "Audio unavailable";
+    return;
+  }
+  if (!audioCtx) audioCtx = new Ctx();
+  if (audioCtx.state === "suspended") await audioCtx.resume();
+
+  const fs = Number(currentFs) || 8000;
+  const data = peakNormalize(currentSamples);
+  const buffer = audioCtx.createBuffer(1, data.length, fs);
+  buffer.getChannelData(0).set(data);
+
+  const source = audioCtx.createBufferSource();
+  source.buffer = buffer;
+  source.connect(audioCtx.destination);
+  source.onended = () => {
+    if (audioSource === source) {
+      audioSource = null;
+      setPlayUi(false);
+    }
+  };
+  audioSource = source;
+  setPlayUi(true);
+  source.start();
+}
+
 async function showObservation(entry) {
   const token = ++drawToken;
+  stopAudio();
+  currentSamples = null;
+  els.play.disabled = true;
+  setPlayUi(false);
   els.title.textContent = entry.label || entry.id;
   els.meta.textContent = "loading…";
   els.status.textContent = "UNCLASSIFIED";
@@ -138,11 +215,14 @@ async function showObservation(entry) {
   ]);
   if (token !== drawToken) return;
 
-  const fs = meta.fs ?? "—";
+  const fs = meta.fs ?? 8000;
   const n = meta.n_samples ?? samples.length;
   const round = meta.round ?? entry.round ?? "—";
   els.status.textContent = meta.status || "UNCLASSIFIED";
   els.meta.textContent = `fs ${fs} Hz · n ${n} · round ${round}`;
+  currentSamples = samples;
+  currentFs = fs;
+  els.play.disabled = false;
   drawWaveform(samples);
 }
 
@@ -164,6 +244,7 @@ async function init() {
     els.title.textContent = "NO RELEASED OBSERVATIONS";
     els.meta.textContent = "Awaiting desk release";
     els.download.classList.add("is-disabled");
+    els.play.disabled = true;
     return;
   }
 
@@ -179,9 +260,12 @@ async function init() {
     if (entry) showObservation(entry);
   });
 
+  els.play.addEventListener("click", () => {
+    togglePlay().catch((err) => console.error(err));
+  });
+
   window.addEventListener("resize", () => {
-    const entry = items.find((o) => o.id === els.select.value);
-    if (entry) showObservation(entry);
+    if (currentSamples) drawWaveform(currentSamples);
   });
 
   await showObservation(items[0]);
