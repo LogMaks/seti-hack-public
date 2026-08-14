@@ -1,0 +1,28 @@
+---
+description: SETI/DST hack public repo — архитектура и запрет спойлеров
+alwaysApply: true
+---
+
+# SETI/DST Hack (public)
+
+Перед работой читай `HANDOFF.md` в корне этого репозитория.
+
+## Границы
+
+- Этот репо: `participant/`, `website/`, позже `materials/`
+- Organizer (генератор, GT, playbook, hidden message) — **отдельный** корень, сюда не копировать
+
+## Архитектура
+
+- Θ = {signal, noise} + m(Θ) как `unknown`
+- Dempster only; baselines: majority / mean / DST
+- Spectrogram на сайте не обязателен
+- Без FastAPI/Docker/тяжёлых DST framework
+
+## Порядок observations
+
+S0 → S1 → S4 → S3 → S2 → S5
+
+## Стиль
+
+Русский язык. Минимум абстракций. Participant понятен за ~10 минут.
