@@ -31,3 +31,5 @@ python3 -m http.server 8765
 Сайт только показывает waveform и отдаёт `.npy`. Анализ — в `participant/`.
 
 Организаторские сценарии и ground truth живут в **отдельном** корне и сюда не входят.
+
+Контекст для продолжения в другом Cursor: [`HANDOFF.md`](HANDOFF.md).
