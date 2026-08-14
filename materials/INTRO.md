@@ -10,6 +10,8 @@
 Станция [ARRAY-7](https://logmaks.github.io/seti-hack-public/) показывает waveform и отдаёт `.npy`.  
 Анализ — только локально, в `participant/`. Сайт ничего не классифицирует.
 
+Брифинг (стрелки / пробел / `F`): [briefing.html](https://logmaks.github.io/seti-hack-public/briefing.html).
+
 Положите скачанный файл в `participant/data/` и запустите:
 
 ```bash

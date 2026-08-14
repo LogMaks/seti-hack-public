@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ARRAY-7 — briefing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg:#071016; --ink:#d7ece3; --muted:#7f9a92; --accent:#3dffa8; --warn:#e8b84a; --line:rgba(120,180,160,.22); }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font-family: "IBM Plex Mono", ui-monospace, monospace; }
+    .deck { height: 100%; }
+    .slide { display: none; height: 100%; padding: clamp(1.5rem, 5vh, 3.5rem) clamp(1.5rem, 6vw, 4.5rem); flex-direction: column; justify-content: center; gap: 1rem; }
+    .slide.on { display: flex; }
+    .eyebrow { margin: 0; color: var(--muted); letter-spacing: .14em; text-transform: uppercase; font-size: .75rem; }
+    h1, h2 { font-family: Syne, sans-serif; font-weight: 800; margin: 0; letter-spacing: .02em; line-height: 1.05; }
+    h1 { font-size: clamp(2.4rem, 8vw, 5.2rem); }
+    h2 { font-size: clamp(1.6rem, 4.5vw, 2.8rem); }
+    p, li { font-size: clamp(.95rem, 2vw, 1.25rem); line-height: 1.45; max-width: 42rem; }
+    p { margin: 0; color: var(--ink); }
+    .muted { color: var(--muted); }
+    .accent { color: var(--accent); }
+    .warn { color: var(--warn); }
+    ul { margin: 0; padding-left: 1.2rem; }
+    li { margin: .35rem 0; }
+    code { color: var(--accent); }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem 2rem; max-width: 52rem; }
+    .card { border: 1px solid var(--line); padding: 1rem 1.1rem; }
+    .card h3 { margin: 0 0 .4rem; font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+    .bar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; padding: .7rem 1.2rem; color: var(--muted); font-size: .72rem; letter-spacing: .08em; }
+    kbd { border: 1px solid var(--line); padding: .05rem .35rem; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="deck" id="deck">
+    <section class="slide on">
+      <p class="eyebrow">Observation terminal · unclassified stream</p>
+      <h1>ARRAY-7</h1>
+      <p class="muted">SETI / DST Hack — listening post briefing</p>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Mission</p>
+      <h2>Не полный сигнал.<br>Не полное согласие.</h2>
+      <p>Главный вопрос: какова природа наблюдения, если свидетельства неполны и противоречат друг другу?</p>
+      <p class="muted">Расшифровка скрытых структур — бонус, не цель.</p>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Station</p>
+      <h2>Данные отдаёт ARRAY-7</h2>
+      <p>Сайт показывает waveform, играет звук и отдаёт <code>.npy</code>. Он ничего не классифицирует.</p>
+      <p>Анализ — только у вас, в <code>participant/</code>.</p>
+      <p class="muted">https://logmaks.github.io/seti-hack-public/</p>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Two desks</p>
+      <h2>Две команды — два вопроса</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Team A · spectral</h3>
+          <p>Есть ли физически выделяемый сигнал?</p>
+          <p class="muted">SNR / FFT peak / band energy</p>
+        </div>
+        <div class="card">
+          <h3>Team B · structure</h3>
+          <p>Есть ли неслучайная структура?</p>
+          <p class="muted">autocorr / entropy / periodicity</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Frame</p>
+      <h2>Θ = {signal, noise}</h2>
+      <p>Третьей гипотезы нет.</p>
+      <p><code>unknown</code> в BPA — это <span class="accent">m(Θ)</span>, масса незнания. Не класс «неизвестно».</p>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Evidence</p>
+      <h2>Каждый детектор → BPA</h2>
+      <p><code>{"signal": 0.60, "noise": 0.15, "unknown": 0.25}</code></p>
+      <p>Сумма = 1. Низкая уверенность → больше массы на Θ, а не «натянуть 0.99».</p>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">DST</p>
+      <h2>Bel · Pl · K</h2>
+      <ul>
+        <li><span class="accent">Bel</span> — сколько массы уже на гипотезе</li>
+        <li><span class="accent">Pl</span> — сколько ещё ей не противоречит</li>
+        <li><span class="accent">K</span> — конфликт до нормировки Демпстера</li>
+      </ul>
+      <p class="muted">Правило — классический Dempster. Если K → 1, комбинация отказана → человек.</p>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Canon</p>
+      <h2>Сначала команды, потом DST</h2>
+      <p>Mean BPA внутри A и внутри B (это не DST).</p>
+      <p>Канон сдачи: <span class="accent">Dempster на A vs B</span>.</p>
+      <p class="muted">Все 6 детекторов сразу — диагностика, не ответ.</p>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Baselines</p>
+      <h2>Три числа на одном наборе</h2>
+      <ul>
+        <li><span class="accent">majority</span> — голоса hard-label</li>
+        <li><span class="accent">mean</span> — среднее BPA</li>
+        <li><span class="accent">DST</span> — комбинация Демпстера</li>
+      </ul>
+      <p>Ищите кейс, где majority спокоен, а DST поднимает K. Такое бывает не на каждом файле.</p>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">HITL</p>
+      <h2>Можно не решать</h2>
+      <ul>
+        <li><code>DECIDE</code> — Bel достаточен, конфликт невысокий</li>
+        <li><code class="warn">HUMAN_REVIEW</code> — высокий K или большое m(Θ)</li>
+        <li><code>OBSERVE_MORE</code> — слабо / ничья, ждать раунд</li>
+      </ul>
+      <p class="muted">Отдельного API «дозапросить отсчёты» нет. Пороги в decision.py можно менять — защитите выбор.</p>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Hand-in</p>
+      <h2>Что сдать по observation</h2>
+      <ul>
+        <li>BPA или team means</li>
+        <li>majority / mean / DST + Bel, Pl, K, m(Θ)</li>
+        <li>действие политики и, если было, решение человека</li>
+        <li>3–5 предложений «почему»</li>
+      </ul>
+      <p class="muted">ИИ разрешён. Метод нужно понимать. ИИ — не ground truth.</p>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">T+10 min</p>
+      <h2>Старт</h2>
+      <p><code>cd participant && pip install -r requirements.txt</code></p>
+      <p><code>python generator_example.py</code></p>
+      <p><code>python main.py data/example_sine.npy</code></p>
+      <p class="muted">Потом скачайте раунд со станции. Порядок ID ≠ порядок раундов.</p>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">ARRAY-7</p>
+      <h1>Human review<br>required.</h1>
+      <p class="muted">Станция не классифицирует источники. Это ваша работа.</p>
+    </section>
+  </main>
+  <div class="bar">
+    <span>ARRAY-7 briefing</span>
+    <span><span id="pos">1 / 13</span> · <kbd>←</kbd> <kbd>→</kbd> <kbd>F</kbd></span>
+  </div>
+  <script>
+    const slides = [...document.querySelectorAll(".slide")];
+    const pos = document.getElementById("pos");
+    let i = 0;
+    function show(n) {
+      i = Math.max(0, Math.min(slides.length - 1, n));
+      slides.forEach((s, k) => s.classList.toggle("on", k === i));
+      pos.textContent = i + 1 + " / " + slides.length;
+    }
+    document.addEventListener("keydown", (e) => {
+      if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); show(i + 1); }
+      if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); show(i - 1); }
+      if (e.key === "Home") show(0);
+      if (e.key === "End") show(slides.length - 1);
+      if (e.key === "f" || e.key === "F") document.documentElement.requestFullscreen?.();
+    });
+    document.getElementById("deck").addEventListener("click", (e) => {
+      show(e.clientX > innerWidth / 2 ? i + 1 : i - 1);
+    });
+  </script>
+</body>
+</html>

@@ -19,6 +19,9 @@ let currentSamples = null;
 let currentFs = 8000;
 let audioCtx = null;
 let audioSource = null;
+let audioGain = null;
+let playT0 = 0;
+let playRaf = 0;
 
 function tickClock() {
   const now = new Date();
@@ -84,7 +87,7 @@ function downsample(arr, maxPoints) {
   return out;
 }
 
-function drawWaveform(samples) {
+function drawWaveform(samples, playhead) {
   const canvas = els.canvas;
   const ctx = canvas.getContext("2d");
   const dpr = window.devicePixelRatio || 1;
@@ -126,18 +129,31 @@ function drawWaveform(samples) {
     else ctx.lineTo(x, y);
   }
   ctx.stroke();
+
+  if (playhead != null) {
+    const x = playhead * cssW;
+    ctx.strokeStyle = "#e8b84a";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, cssH);
+    ctx.stroke();
+  }
 }
 
 function setPlayUi(playing) {
   if (!els.play) return;
-  els.play.textContent = playing ? "Stop audio" : "Play audio";
+  els.play.textContent = playing ? "Stop listen" : "Listen to source";
   els.play.classList.toggle("is-playing", playing);
   els.play.setAttribute("aria-pressed", playing ? "true" : "false");
 }
 
 function stopAudio() {
+  if (playRaf) {
+    cancelAnimationFrame(playRaf);
+    playRaf = 0;
+  }
   if (audioSource) {
-    audioSource.onended = null;
     try {
       audioSource.stop();
     } catch {
@@ -146,24 +162,57 @@ function stopAudio() {
     audioSource.disconnect();
     audioSource = null;
   }
+  if (audioGain) {
+    audioGain.disconnect();
+    audioGain = null;
+  }
   setPlayUi(false);
 }
 
-function peakNormalize(samples, peak = 0.85) {
-  let maxAbs = 0;
-  for (let i = 0; i < samples.length; i++) {
-    const a = Math.abs(samples[i]);
-    if (a > maxAbs) maxAbs = a;
+function resampleLinear(src, srcRate, dstRate) {
+  if (Math.abs(srcRate - dstRate) < 1e-6) return src;
+  const nOut = Math.max(1, Math.round((src.length * dstRate) / srcRate));
+  const out = new Float32Array(nOut);
+  const ratio = (src.length - 1) / Math.max(1, nOut - 1);
+  for (let i = 0; i < nOut; i++) {
+    const x = i * ratio;
+    const i0 = Math.min(src.length - 1, Math.floor(x));
+    const i1 = Math.min(src.length - 1, i0 + 1);
+    const t = x - i0;
+    out[i] = src[i0] * (1 - t) + src[i1] * t;
   }
-  const gain = maxAbs > 1e-9 ? peak / maxAbs : 0;
-  const out = new Float32Array(samples.length);
-  for (let i = 0; i < samples.length; i++) out[i] = samples[i] * gain;
   return out;
+}
+
+function prepareAudio(samples, srcRate, dstRate) {
+  let mean = 0;
+  for (let i = 0; i < samples.length; i++) mean += samples[i];
+  mean /= samples.length || 1;
+  const centered = new Float32Array(samples.length);
+  let peak = 0;
+  for (let i = 0; i < samples.length; i++) {
+    const v = samples[i] - mean;
+    centered[i] = v;
+    const a = Math.abs(v);
+    if (a > peak) peak = a;
+  }
+  const g = peak > 1e-9 ? 0.85 / peak : 0;
+  for (let i = 0; i < centered.length; i++) centered[i] *= g;
+  return resampleLinear(centered, srcRate, dstRate);
+}
+
+function tickPlayhead() {
+  if (!audioSource || !audioCtx || !currentSamples) return;
+  const dur = currentSamples.length / (Number(currentFs) || 8000);
+  const t = ((audioCtx.currentTime - playT0) % dur) / dur;
+  drawWaveform(currentSamples, t);
+  playRaf = requestAnimationFrame(tickPlayhead);
 }
 
 async function togglePlay() {
   if (audioSource) {
     stopAudio();
+    if (currentSamples) drawWaveform(currentSamples);
     return;
   }
   if (!currentSamples || !currentSamples.length) return;
@@ -177,23 +226,25 @@ async function togglePlay() {
   if (!audioCtx) audioCtx = new Ctx();
   if (audioCtx.state === "suspended") await audioCtx.resume();
 
-  const fs = Number(currentFs) || 8000;
-  const data = peakNormalize(currentSamples);
-  const buffer = audioCtx.createBuffer(1, data.length, fs);
+  const srcRate = Number(currentFs) || 8000;
+  const data = prepareAudio(currentSamples, srcRate, audioCtx.sampleRate);
+  const buffer = audioCtx.createBuffer(1, data.length, audioCtx.sampleRate);
   buffer.getChannelData(0).set(data);
 
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.55;
   const source = audioCtx.createBufferSource();
   source.buffer = buffer;
-  source.connect(audioCtx.destination);
-  source.onended = () => {
-    if (audioSource === source) {
-      audioSource = null;
-      setPlayUi(false);
-    }
-  };
+  source.loop = true;
+  source.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  audioGain = gain;
   audioSource = source;
+  playT0 = audioCtx.currentTime;
   setPlayUi(true);
   source.start();
+  tickPlayhead();
 }
 
 async function showObservation(entry) {
@@ -261,7 +312,11 @@ async function init() {
   });
 
   els.play.addEventListener("click", () => {
-    togglePlay().catch((err) => console.error(err));
+    togglePlay().catch((err) => {
+      console.error(err);
+      stopAudio();
+      els.meta.textContent = String(err.message || err);
+    });
   });
 
   window.addEventListener("resize", () => {

@@ -64,7 +64,7 @@ python main.py data/example_sine.npy
 ```
 
 ### `website/`
-- ARRAY-7: waveform, Play audio, download `.npy`, status UNCLASSIFIED
+- ARRAY-7: waveform, Play audio, download `.npy`, briefing, status UNCLASSIFIED
 - Pages: `.github/workflows/pages.yml` (артефакт = `website/`)
 - `released` прячет пункт в UI, **не** прячет файл. Живой хак: не пушить будущие `.npy`
 - `?all=1` — отладка организатора
