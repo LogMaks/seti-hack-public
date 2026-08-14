@@ -1,0 +1,7 @@
+{
+  "id": "obs_s3",
+  "fs": 8000.0,
+  "round": 4,
+  "status": "UNCLASSIFIED",
+  "n_samples": 8000
+}

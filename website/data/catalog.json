@@ -1,0 +1,56 @@
+{
+  "station_id": "ARRAY-7",
+  "station_name": "ARRAY-7 Listening Post",
+  "tagline": "Deep-sky transient desk",
+  "note": "During the live event, set released=false for future rounds. For local demo all may be true.",
+  "observations": [
+    {
+      "id": "obs_s0",
+      "round": 1,
+      "released": true,
+      "label": "OBS-S0",
+      "npy": "data/obs_s0.npy",
+      "meta": "data/obs_s0.json"
+    },
+    {
+      "id": "obs_s1",
+      "round": 2,
+      "released": true,
+      "label": "OBS-S1",
+      "npy": "data/obs_s1.npy",
+      "meta": "data/obs_s1.json"
+    },
+    {
+      "id": "obs_s4",
+      "round": 3,
+      "released": true,
+      "label": "OBS-S4",
+      "npy": "data/obs_s4.npy",
+      "meta": "data/obs_s4.json"
+    },
+    {
+      "id": "obs_s3",
+      "round": 4,
+      "released": true,
+      "label": "OBS-S3",
+      "npy": "data/obs_s3.npy",
+      "meta": "data/obs_s3.json"
+    },
+    {
+      "id": "obs_s2",
+      "round": 5,
+      "released": true,
+      "label": "OBS-S2",
+      "npy": "data/obs_s2.npy",
+      "meta": "data/obs_s2.json"
+    },
+    {
+      "id": "obs_s5",
+      "round": 6,
+      "released": true,
+      "label": "OBS-S5",
+      "npy": "data/obs_s5.npy",
+      "meta": "data/obs_s5.json"
+    }
+  ]
+}

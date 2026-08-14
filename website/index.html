@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ARRAY-7 — Listening Post</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="top">
+    <div class="brand-block">
+      <p class="eyebrow">Observation terminal · unclassified stream</p>
+      <h1 class="brand">ARRAY-7</h1>
+      <p class="tagline">Listening Post — deep-sky transient desk</p>
+    </div>
+    <div class="clock-block">
+      <span class="clock-label">UTC desk</span>
+      <time id="utc-clock" class="clock">--:--:--</time>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="select-row" aria-label="Observation select">
+      <label class="field">
+        <span>Observation ID</span>
+        <select id="obs-select"></select>
+      </label>
+      <div class="status-wrap">
+        <span class="status-label">Status</span>
+        <span id="status-badge" class="status">UNCLASSIFIED</span>
+      </div>
+      <a id="download-btn" class="btn" href="#" download>Download observation</a>
+    </section>
+
+    <section class="scope" aria-label="Waveform">
+      <div class="scope-head">
+        <h2 id="obs-title">—</h2>
+        <p id="obs-meta" class="meta-line">fs — · n — · round —</p>
+      </div>
+      <canvas id="wave" width="1200" height="360" role="img" aria-label="Waveform display"></canvas>
+      <p class="hint">This terminal only presents and serves data. Analysis runs in your local participant toolkit.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>ARRAY-7 does not classify sources. Human review required for contested evidence.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
