@@ -2,6 +2,8 @@
 
 Публичные материалы образовательного хака (анализ неизвестного сигнала + DST + HITL).
 
+**Станция ARRAY-7 (GitHub Pages):** https://logmaks.github.io/seti-hack-public/
+
 ```text
 seti-hack-public/
 ├── participant/     # Python baseline
@@ -18,7 +20,7 @@ python main.py data/example_noise.npy
 python main.py data/example_sine.npy
 ```
 
-## Website
+## Website (локально)
 
 ```bash
 cd website
@@ -28,6 +30,4 @@ python3 -m http.server 8765
 
 Сайт только показывает waveform и отдаёт `.npy`. Анализ — в `participant/`.
 
-Организаторские сценарии и ground truth — в отдельном корне `seti-hack-organizer/` (не здесь).
-
-Полный контекст для продолжения разработки: корневой `HANDOFF.md`.
+Организаторские сценарии и ground truth живут в **отдельном** корне и сюда не входят.
