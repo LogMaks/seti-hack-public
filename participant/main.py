@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-One observation: load → A/B detectors → majority / mean / DST → HITL.
+One observation: load → A/B detectors → majority / mean / DST → team policy.
 
 Canon: DST on team-mean A vs team-mean B. All-6 detectors are diagnostics.
 
@@ -78,7 +78,7 @@ def analyze(path: Path, ask_human: bool = False) -> dict:
     if ask_human:
         human = human_review_prompt(str(meta.get("id", path.name)), report_teams)
     elif report_teams["policy"]["action"] == "HUMAN_REVIEW":
-        print("\n(HITL recommended — re-run with --human to enter a decision)")
+        print("\n(teams should write a verdict — re-run with --human)")
 
     return {
         "meta": meta,
@@ -93,7 +93,7 @@ def analyze(path: Path, ask_human: bool = False) -> dict:
 def main() -> None:
     p = argparse.ArgumentParser(description="SETI/DST hack — analyze one observation")
     p.add_argument("observation", type=Path, help="path to .npy observation")
-    p.add_argument("--human", action="store_true", help="force human review prompt")
+    p.add_argument("--human", action="store_true", help="enter team verdict (A vs B review)")
     args = p.parse_args()
     analyze(args.observation, ask_human=args.human)
 

@@ -44,9 +44,17 @@
 
     <section class="slide">
       <p class="eyebrow">Mission</p>
-      <h2>Не полный сигнал.<br>Не полное согласие.</h2>
-      <p>Главный вопрос: какова природа наблюдения, если свидетельства неполны и противоречат друг другу?</p>
-      <p class="muted">Расшифровка скрытых структур — бонус, не цель.</p>
+      <h2>Сигнал или шум?</h2>
+      <p>Команда A смотрит спектр. Команда B — структуру. DST сливает числа. Решают сами команды.</p>
+      <p class="muted">Это основное. Легкий слой. Его сдают всегда.</p>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Track 2</p>
+      <h2>Зашифрованный текст</h2>
+      <p>В потоке может быть закодированный фрагмент.</p>
+      <p>Найти и прочитать — бонус, не замена baseline.</p>
+      <p class="muted">Где лежит и как закодировано — часть задачи. Подсказок нет.</p>
     </section>
 
     <section class="slide">
@@ -96,7 +104,7 @@
         <li><span class="accent">Pl</span> — сколько ещё ей не противоречит</li>
         <li><span class="accent">K</span> — конфликт до нормировки Демпстера</li>
       </ul>
-      <p class="muted">Правило — классический Dempster. Если K → 1, комбинация отказана → человек.</p>
+      <p class="muted">Правило — классический Dempster. Если K → 1, комбинация отказана — спор команд, не внешний эксперт.</p>
     </section>
 
     <section class="slide">
@@ -113,7 +121,7 @@
       <h2>Mean спокоен. DST нет.</h2>
       <p>A <code>0.70 / 0.10 / 0.20</code> · B <code>0.10 / 0.70 / 0.20</code></p>
       <p>majority / mean → ничья <code>0.40 / 0.40 / 0.20</code></p>
-      <p>DST, K=0.50 → <span class="warn">HUMAN_REVIEW</span></p>
+      <p>DST, K=0.50 → <span class="warn">HUMAN_REVIEW</span> — вердикт пишут команды</p>
       <p class="muted">Это учебный кейс хака. K→1 — комбинация отказана.</p>
     </section>
 
@@ -137,14 +145,14 @@
     </section>
 
     <section class="slide">
-      <p class="eyebrow">HITL</p>
-      <h2>Можно не решать</h2>
+      <p class="eyebrow">Policy</p>
+      <h2>Автомат предлагает. Команды решают.</h2>
       <ul>
         <li><code>DECIDE</code> — Bel достаточен, конфликт невысокий</li>
-        <li><code class="warn">HUMAN_REVIEW</code> — высокий K или большое m(Θ)</li>
+        <li><code class="warn">HUMAN_REVIEW</code> — спор A vs B, высокий K или m(Θ)</li>
         <li><code>OBSERVE_MORE</code> — слабо / ничья, ждать раунд</li>
       </ul>
-      <p class="muted">Отдельного API «дозапросить отсчёты» нет. Пороги в decision.py можно менять — защитите выбор.</p>
+      <p class="muted">Внешнего судьи нет. Пороги в decision.py можно менять — защитите выбор.</p>
     </section>
 
     <section class="slide">
@@ -153,10 +161,10 @@
       <ul>
         <li>BPA или team means</li>
         <li>majority / mean / DST + Bel, Pl, K, m(Θ)</li>
-        <li>действие политики и, если было, решение человека</li>
+        <li>действие политики и вердикт команд</li>
         <li>3–5 предложений «почему»</li>
       </ul>
-      <p class="muted">ИИ разрешён. Метод нужно понимать. ИИ — не ground truth.</p>
+      <p class="muted">ИИ разрешён. Текст в потоке — бонус, не замена этой сдачи.</p>
     </section>
 
     <section class="slide">
@@ -170,8 +178,8 @@
 
     <section class="slide">
       <p class="eyebrow">ARRAY-7</p>
-      <h1>Human review<br>required.</h1>
-      <p class="muted">Станция не классифицирует источники. Это ваша работа.</p>
+      <h1>The desks<br>decide.</h1>
+      <p class="muted">Станция не классифицирует источники. Это соревнование двух команд.</p>
     </section>
   </main>
   <div class="bar">

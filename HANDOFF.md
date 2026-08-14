@@ -12,9 +12,8 @@
 
 ## 1. Суть
 
-Образовательный хак: неизвестный сигнал → детекторы → BPA → DST → Bel/Pl/K → decision / HITL.  
-Главная цель — решение при неполных и конфликтных свидетельствах.  
-Расшифровка скрытых структур — необязательный бонус, не цель baseline.
+Образовательный хак в два слоя: (1) сигнал или шум, DST, решение команд; (2) бонус — зашифрованный текст в потоке.  
+Внешнего судьи нет. В public нельзя писать plaintext и «где / как закодировано».
 
 ---
 
@@ -36,9 +35,9 @@ seti-hack-organizer/   ← отдельный приватный корень / 
 | Θ | `{signal, noise}` + `m(Θ)` как ключ `unknown` |
 | DST | классический Dempster |
 | Baselines | majority · mean BPA · DST |
-| HITL | K / m(Θ) / Bel → DECIDE \| HUMAN_REVIEW \| OBSERVE_MORE |
+| Политика | K / m(Θ) / Bel → DECIDE \| HUMAN_REVIEW (спор команд) \| OBSERVE_MORE |
 | Канон | DST на team-mean A vs B; все 6 детекторов — диагностика |
-| K→1 | комбинация отказана → HUMAN_REVIEW, не traceback |
+| K→1 | комбинация отказана → HUMAN_REVIEW (вердикт команд), не traceback |
 | S2 | объяснимый структурированный сигнал, не третий класс в коде |
 | Spectrogram на сайте | не нужен в MVP |
 | Конфликт | искать кейс, где majority/mean «спокойны», а DST поднимает K / ведёт в HUMAN_REVIEW — не обещать это на каждом файле |
@@ -52,7 +51,7 @@ seti-hack-organizer/   ← отдельный приватный корень / 
 ### `participant/`
 - `dst.py`, `decision.py`, `detectors_a.py`, `detectors_b.py`
 - `io_utils.py`, `generator_example.py` (toy noise/sine)
-- `main.py` — HITL только с `--human`
+- `main.py` — вердикт команд через `--human`
 
 ```bash
 cd participant

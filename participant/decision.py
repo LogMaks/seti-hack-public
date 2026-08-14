@@ -1,8 +1,8 @@
 """
-Baselines + HITL. Canon fusion is team-mean A vs B (see main.py).
+Baselines + team policy. Canon fusion is team-mean A vs B (see main.py).
 
 majority / mean score / Dempster, then:
-  high K or high m(Θ) → HUMAN_REVIEW
+  high K or high m(Θ) → HUMAN_REVIEW (teams write the verdict)
   weak / tied belief → OBSERVE_MORE
   else → DECIDE(signal|noise)
 """
@@ -119,14 +119,14 @@ def compare_baselines(masses: list[dict]) -> dict:
 
 
 def human_review_prompt(obs_id: str, report: dict) -> str | None:
-    print("\n=== HUMAN REVIEW ===")
+    print("\n=== TEAM REVIEW ===")
     print(f"observation: {obs_id}")
     print(f"policy:      {report['policy']}")
     print(f"DST mass:    {report['dst']['mass']}")
     print(f"majority:    {report['majority']['decision']}")
     print(f"mean:        {report['mean']['decision']}")
     try:
-        ans = input("Your decision [signal/noise/abstain/skip]: ").strip().lower()
+        ans = input("Team verdict [signal/noise/abstain/skip]: ").strip().lower()
     except EOFError:
         return None
     return ans if ans in {"signal", "noise", "abstain"} else None
