@@ -10,7 +10,8 @@
 Станция [ARRAY-7](https://logmaks.github.io/seti-hack-public/) показывает waveform и отдаёт `.npy`.  
 Анализ — только локально, в `participant/`. Сайт ничего не классифицирует.
 
-Брифинг (стрелки / пробел / `F`): [briefing.html](https://logmaks.github.io/seti-hack-public/briefing.html).
+Брифинги на станции: [Intro](https://logmaks.github.io/seti-hack-public/docs.html) · [Team A](https://logmaks.github.io/seti-hack-public/docs.html#team-a) · [Team B](https://logmaks.github.io/seti-hack-public/docs.html#team-b) · [DST](https://logmaks.github.io/seti-hack-public/docs.html#dst).  
+Зал: [briefing.html](https://logmaks.github.io/seti-hack-public/briefing.html).
 
 Положите скачанный файл в `participant/data/` и запустите:
 
@@ -45,4 +46,4 @@ python main.py data/obs_s0.npy
 
 Cursor и другие ИИ **разрешены**. Команда должна понимать метод и объяснить результат. ИИ — не ground truth.
 
-Дальше: [TEAM_A.md](TEAM_A.md), [TEAM_B.md](TEAM_B.md), [DST_CHEATSHEET.md](DST_CHEATSHEET.md).
+Дальше на станции: [Team A](https://logmaks.github.io/seti-hack-public/docs.html#team-a), [Team B](https://logmaks.github.io/seti-hack-public/docs.html#team-b), [DST](https://logmaks.github.io/seti-hack-public/docs.html#dst).

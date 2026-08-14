@@ -33,7 +33,8 @@ python3 -m http.server 8765
 
 Сайт только показывает waveform и отдаёт `.npy`. Анализ — в `participant/`.
 
-Брифинг для зала: [`website/briefing.html`](website/briefing.html) (после деплоя — `/briefing.html`).
+Брифинги: [`website/docs.html`](website/docs.html) (после деплоя — `/docs.html`).  
+Зал: [`website/briefing.html`](website/briefing.html).
 
 Организаторские сценарии и ground truth живут в **отдельном** корне и сюда не входят.
 

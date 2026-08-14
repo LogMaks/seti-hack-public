@@ -25,4 +25,4 @@
 - Низкая уверенность → больше массы на `unknown`, а не «натянуть» 0.99.  
 - Согласие трёх детекторов A — ещё не ответ хака: канон — DST **между командами**.
 
-Сверка с Team B и политика — в [DST_CHEATSHEET.md](DST_CHEATSHEET.md). Общий кадр — [INTRO.md](INTRO.md).
+Сверка с Team B и политика — [DST](https://logmaks.github.io/seti-hack-public/docs.html#dst). Общий кадр — [Intro](https://logmaks.github.io/seti-hack-public/docs.html).

@@ -25,4 +25,4 @@
 - Конфликт A vs B как раз учебный кейс: majority может быть спокоен, DST поднимет K.  
 - Канон сдачи — DST на team mean A против team mean B, не голосование шести сырых детекторов.
 
-Сверка и политика — [DST_CHEATSHEET.md](DST_CHEATSHEET.md). Общий кадр — [INTRO.md](INTRO.md).
+Сверка и политика — [DST](https://logmaks.github.io/seti-hack-public/docs.html#dst). Общий кадр — [Intro](https://logmaks.github.io/seti-hack-public/docs.html).

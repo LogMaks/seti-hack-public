@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ARRAY-7 — desk notes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="docs-body">
+  <div class="grain" aria-hidden="true"></div>
+  <header class="top">
+    <div class="brand-block">
+      <p class="eyebrow">Desk notes · unclassified</p>
+      <h1 class="brand brand-sm">ARRAY-7</h1>
+      <p class="tagline">Participant briefings — canon, teams, DST</p>
+    </div>
+    <a class="btn btn-ghost" href="index.html">Terminal</a>
+  </header>
+
+  <nav class="doc-nav" aria-label="Briefings">
+    <a href="#intro" data-tab="intro">Intro</a>
+    <a href="#team-a" data-tab="team-a">Team A</a>
+    <a href="#team-b" data-tab="team-b">Team B</a>
+    <a href="#dst" data-tab="dst">DST</a>
+    <a href="briefing.html">Hall deck</a>
+  </nav>
+
+  <main class="stage prose">
+    <article id="intro">
+      <h2>SETI / DST Hack</h2>
+      <p>Неизвестный зашумлённый сигнал. Две команды собирают evidence, сливают через Dempster–Shafer и решают: принять гипотезу, воздержаться или отдать человеку.</p>
+      <p><strong>Главный вопрос:</strong> какова природа наблюдения при неполных и конфликтных свидетельствах? Расшифровка скрытых структур — бонус, не цель baseline.</p>
+      <h3>Откуда данные</h3>
+      <p>Станция показывает waveform и отдаёт <code>.npy</code>. Анализ — только в <code>participant/</code>. Сайт ничего не классифицирует.</p>
+      <pre>cd participant
+python main.py data/obs_s0.npy</pre>
+      <p class="muted">Порядок раундов задаёт организатор, не алфавит ID.</p>
+      <h3>Канон сдачи</h3>
+      <ol>
+        <li>Team A и Team B независимо получают BPA.</li>
+        <li>Внутри команды — среднее BPA (<code>mean</code>, это не DST).</li>
+        <li><strong>Канон:</strong> Dempster на двух team means (A vs B).</li>
+        <li>majority и mean рядом — чтобы сравнить, не заменить DST.</li>
+        <li>Все 6 детекторов — диагностика, не сдача.</li>
+      </ol>
+      <p>Сдавать: BPA или team means; majority / mean / DST; Bel, Pl, K, m(Θ); действие политики; если было — решение человека; 3–5 предложений «почему».</p>
+      <h3>Политика</h3>
+      <table>
+        <thead><tr><th>Действие</th><th>Смысл</th></tr></thead>
+        <tbody>
+          <tr><td><code>DECIDE</code></td><td>достаточно Bel, конфликт невысокий</td></tr>
+          <tr><td><code>HUMAN_REVIEW</code></td><td>высокий K или большое m(Θ); при K→1 комбинация отказана, не «упала»</td></tr>
+          <tr><td><code>OBSERVE_MORE</code></td><td>слабо / ничья — ждать следующий раунд, отдельного API нет</td></tr>
+        </tbody>
+      </table>
+      <p>Пороги в <code>decision.py</code> можно менять — выбор нужно защитить. ИИ разрешён. Метод нужно понимать. ИИ — не ground truth.</p>
+    </article>
+
+    <article id="team-a">
+      <h2>Team A — спектр</h2>
+      <p>Вопрос: <strong>есть ли физически выделяемый сигнал</strong> (против noise-like спектра)?</p>
+      <p>Код: <code>detectors_a.py</code> → <code>run_team_a(x, fs)</code> → список BPA.</p>
+      <table>
+        <thead><tr><th>Детектор</th><th>Идея</th></tr></thead>
+        <tbody>
+          <tr><td><code>snr</code></td><td>пик PSD относительно медианы</td></tr>
+          <tr><td><code>fft_peak</code></td><td>узкий пик в амплитудном спектре</td></tr>
+          <tr><td><code>band_energy</code></td><td>доля энергии в top-k бинах</td></tr>
+        </tbody>
+      </table>
+      <p>BPA: <code>{"signal", "noise", "unknown"}</code>, сумма 1. <code>unknown</code> = m(Θ), не третий класс.</p>
+      <h3>Можно менять</h3>
+      <p>Пороги, окна, бины, score→BPA. Новый признак — только если объясняете.</p>
+      <p>Нельзя: подглядывать метки, вводить третью гипотезу в Θ без решения всей команды, сдавать график без BPA.</p>
+      <ul>
+        <li>Высокая энергия ≠ автоматически <code>signal</code>.</li>
+        <li>Низкая уверенность → масса на <code>unknown</code>, не «натянуть 0.99».</li>
+        <li>Согласие трёх детекторов A — ещё не ответ: канон — DST между командами.</li>
+      </ul>
+    </article>
+
+    <article id="team-b">
+      <h2>Team B — структура</h2>
+      <p>Вопрос: <strong>есть ли неслучайная структура</strong> в наблюдении?</p>
+      <p>Код: <code>detectors_b.py</code> → <code>run_team_b(x, fs)</code> → список BPA.</p>
+      <table>
+        <thead><tr><th>Детектор</th><th>Идея</th></tr></thead>
+        <tbody>
+          <tr><td><code>autocorr</code></td><td>сильный пик автокорреляции при ненулевом лаге</td></tr>
+          <tr><td><code>entropy</code></td><td>ниже энтропия амплитуд, чем у шума → больше структуры</td></tr>
+          <tr><td><code>periodicity</code></td><td>повтор / модуляция через спектр квадрата</td></tr>
+        </tbody>
+      </table>
+      <p>BPA: <code>{"signal", "noise", "unknown"}</code>, сумма 1. <code>unknown</code> = m(Θ), не третий класс.</p>
+      <h3>Можно менять</h3>
+      <p>Лаги, бины, пороги, score→BPA. Новый признак — только если объясняете, что он меряет.</p>
+      <p>Нельзя: искать «скрытое сообщение» вместо BPA (бонус, не сдача); подгонять ответ под Team A, пока не посчитали свой набор.</p>
+      <ul>
+        <li>A смотрит «выделяется ли», B — «не случайно ли».</li>
+        <li>Конфликт A vs B — учебный кейс: majority может быть спокоен, DST поднимает K.</li>
+        <li>Канон — DST на team mean A против team mean B, не голосование шести детекторов.</li>
+      </ul>
+    </article>
+
+    <article id="dst">
+      <h2>DST — шпаргалка</h2>
+      <p>Θ = {signal, noise}. Третьей гипотезы нет.</p>
+      <pre>{"signal": 0.60, "noise": 0.15, "unknown": 0.25}  # сумма 1</pre>
+      <p><code>unknown</code> — <strong>m(Θ)</strong>, масса незнания. Не класс «unknown».</p>
+      <table>
+        <thead><tr><th>Величина</th><th>Смысл</th></tr></thead>
+        <tbody>
+          <tr><td>Bel(A)</td><td>m(A) — сколько массы уже на гипотезе</td></tr>
+          <tr><td>Pl(A)</td><td>m(A) + m(Θ) — сколько ещё не противоречит A</td></tr>
+          <tr><td>K</td><td>конфликт <strong>до</strong> нормировки Демпстера</td></tr>
+        </tbody>
+      </table>
+      <p>Правило — классический Dempster (<code>dst.combine</code>). Другие правила в baseline нет.</p>
+      <p>После комбинации: <code>m(signal) = (s·s + s·Θ + Θ·s) / (1−K)</code>; <code>m(Θ) = Θ·Θ / (1−K)</code>.</p>
+      <h3>Пример 1 — согласие</h3>
+      <p>Оба слегка за signal. DST усиливает согласие, unknown падает. Mean этого не делает.</p>
+      <table>
+        <thead><tr><th></th><th>signal</th><th>noise</th><th>unknown</th></tr></thead>
+        <tbody>
+          <tr><td>A</td><td>0.60</td><td>0.10</td><td>0.30</td></tr>
+          <tr><td>B</td><td>0.50</td><td>0.10</td><td>0.40</td></tr>
+          <tr><td>mean</td><td>0.55</td><td>0.10</td><td>0.35</td></tr>
+          <tr><td>DST, K=0.11</td><td><strong>0.78</strong></td><td>0.09</td><td>0.13</td></tr>
+        </tbody>
+      </table>
+      <h3>Пример 2 — конфликт</h3>
+      <p>A за signal, B за noise. Majority и mean спокойны (ничья). DST поднимает K.</p>
+      <table>
+        <thead><tr><th></th><th>signal</th><th>noise</th><th>unknown</th></tr></thead>
+        <tbody>
+          <tr><td>A</td><td>0.70</td><td>0.10</td><td>0.20</td></tr>
+          <tr><td>B</td><td>0.10</td><td>0.70</td><td>0.20</td></tr>
+          <tr><td>mean</td><td>0.40</td><td>0.40</td><td>0.20</td></tr>
+          <tr><td>DST, K=0.50</td><td>0.46</td><td>0.46</td><td>0.08</td></tr>
+        </tbody>
+      </table>
+      <p>Majority → abstain. K=0.50 ≥ 0.25 → <code>HUMAN_REVIEW</code>. Если A=<code>(1,0,0)</code> и B=<code>(0,1,0)</code>, K→1: комбинация отказана, тоже человек.</p>
+      <h3>Конфликт</h3>
+      <p>K = m1(signal)·m2(noise) + m1(noise)·m2(signal).</p>
+      <p>Если K → 1, комбинация не определена. Код не падает: политика → <code>HUMAN_REVIEW</code>. Это не «положить конфликт в unknown».</p>
+      <p><code>max_conflict</code> — максимум <strong>последовательных</strong> pairwise K. Порядок источников влияет на число. Учебный прокси, не инвариант n источников.</p>
+      <h3>Три baseline</h3>
+      <ol>
+        <li><strong>majority</strong> — hard-label по Bel, ничья → abstain</li>
+        <li><strong>mean</strong> — среднее BPA (не DST)</li>
+        <li><strong>DST</strong> — Dempster</li>
+      </ol>
+      <p>Имеет смысл искать файл, где majority/mean спокойны, а DST поднимает K. Такое бывает не на каждом наблюдении.</p>
+      <p>Канон: mean внутри A и внутри B, затем Dempster <strong>A vs B</strong>. Все 6 детекторов — диагностика.</p>
+      <p>Высокий K или большое m(Θ) → человек. Слабый Bel или ничья → <code>OBSERVE_MORE</code> (ждать раунд, не API). Иначе <code>DECIDE</code>.</p>
+    </article>
+  </main>
+
+  <footer class="foot">
+    <p>ARRAY-7 does not classify sources. Notes match the participant kit; they are not ground truth.</p>
+  </footer>
+  <script>
+    const tabs = [...document.querySelectorAll(".doc-nav a[data-tab]")];
+    const pages = [...document.querySelectorAll("main article")];
+    function openTab() {
+      const id = (location.hash || "#intro").slice(1);
+      const ok = pages.some((p) => p.id === id) ? id : "intro";
+      pages.forEach((p) => { p.hidden = p.id !== ok; });
+      tabs.forEach((a) => a.classList.toggle("is-on", a.dataset.tab === ok));
+    }
+    window.addEventListener("hashchange", openTab);
+    openTab();
+  </script>
+</body>
+</html>

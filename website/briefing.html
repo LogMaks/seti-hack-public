@@ -100,6 +100,24 @@
     </section>
 
     <section class="slide">
+      <p class="eyebrow">Example 1 · agree</p>
+      <h2>DST усиливает согласие</h2>
+      <p>A <code>0.60 / 0.10 / 0.30</code> · B <code>0.50 / 0.10 / 0.40</code></p>
+      <p>mean → <code>0.55 / 0.10 / 0.35</code></p>
+      <p>DST, K=0.11 → <span class="accent">0.78 / 0.09 / 0.13</span></p>
+      <p class="muted">Unknown падает. Mean так не делает.</p>
+    </section>
+
+    <section class="slide">
+      <p class="eyebrow">Example 2 · conflict</p>
+      <h2>Mean спокоен. DST нет.</h2>
+      <p>A <code>0.70 / 0.10 / 0.20</code> · B <code>0.10 / 0.70 / 0.20</code></p>
+      <p>majority / mean → ничья <code>0.40 / 0.40 / 0.20</code></p>
+      <p>DST, K=0.50 → <span class="warn">HUMAN_REVIEW</span></p>
+      <p class="muted">Это учебный кейс хака. K→1 — комбинация отказана.</p>
+    </section>
+
+    <section class="slide">
       <p class="eyebrow">Canon</p>
       <h2>Сначала команды, потом DST</h2>
       <p>Mean BPA внутри A и внутри B (это не DST).</p>

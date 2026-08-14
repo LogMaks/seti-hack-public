@@ -17,7 +17,7 @@ python main.py data/example_noise.npy
 python main.py data/example_sine.npy
 ```
 
-Брифинги: [`../materials/INTRO.md`](../materials/INTRO.md).
+Брифинги: [станция /docs.html](https://logmaks.github.io/seti-hack-public/docs.html) или [`../materials/INTRO.md`](../materials/INTRO.md).
 
 ## Канон
 
