@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ARRAY-7 — briefing</title>
+  <title>ARRAY-7 — брифинг</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
@@ -33,7 +33,7 @@
     kbd { border: 1px solid var(--line); padding: .05rem .35rem; }
     .viz { display: flex; flex-direction: column; gap: 1rem; max-width: 52rem; width: 100%; }
     .mass-row { display: grid; grid-template-columns: 5.5rem 1fr 4.5rem; gap: .75rem; align-items: center; }
-    .mass-row.tight { grid-template-columns: 7.2rem 1fr 3.2rem; gap: .45rem; }
+    .mass-row.tight { grid-template-columns: 7.8rem 1fr 4.2rem; gap: .45rem; }
     .mass-row.tight .tag { font-size: .68rem; }
     .viz.compact .stack { height: 1.15rem; }
     .viz.compact { gap: .45rem; }
@@ -69,101 +69,101 @@
 <body>
   <main class="deck" id="deck">
     <section class="slide on">
-      <p class="eyebrow">Observation terminal · unclassified stream</p>
+      <p class="eyebrow">Терминал наблюдений · несекретно</p>
       <h1>ARRAY-7</h1>
-      <p class="muted">SETI / DST Hack — listening post briefing</p>
+      <p class="muted">SETI / DST Hack — брифинг станции прослушивания</p>
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Mission</p>
+      <p class="eyebrow">Миссия</p>
       <h2>Сигнал или шум?</h2>
-      <p>Шесть детекторов снимают evidence. DST сливает числа. Решает сама команда.</p>
-      <p class="muted">Это основное. Легкий слой. Его сдают всегда.</p>
+      <p>Шесть детекторов снимают свидетельства. DST сливает числа. Решает сама команда.</p>
+      <p class="muted">Это основное. Лёгкий слой. Его сдают всегда.</p>
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Track 2</p>
+      <p class="eyebrow">Дорожка 2</p>
       <h2>Зашифрованный текст</h2>
       <p>В потоке может быть закодированный фрагмент.</p>
-      <p>Сначала сдайте природу: signal или noise. Потом можно копать <span class="accent">глубже метки</span> — структура, несущая, биты.</p>
-      <p>Найти и прочитать — бонус, не замена baseline.</p>
+      <p>Сначала сдайте природу: <span class="accent">сигнал</span> или <span class="accent">шум</span>. Потом можно копать <span class="accent">глубже метки</span> — структура, несущая, биты.</p>
+      <p>Найти и прочитать — бонус, не замена основной сдачи.</p>
       <p class="muted">Где лежит и как закодировано — часть задачи. Подсказок нет.</p>
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Station</p>
+      <p class="eyebrow">Станция</p>
       <h2>Данные отдаёт ARRAY-7</h2>
-      <p>Сайт показывает waveform, играет звук и отдаёт <code>.npy</code>. Он ничего не классифицирует.</p>
+      <p>Сайт показывает осциллограмму, играет звук и отдаёт <code>.npy</code>. Он ничего не классифицирует.</p>
       <p>Анализ — только у вас, в <code>participant/</code>.</p>
       <p class="muted">https://logmaks.github.io/seti-hack-public/</p>
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Six sources</p>
+      <p class="eyebrow">Шесть источников</p>
       <h2>Одна команда — шесть детекторов</h2>
       <div class="grid">
         <div class="card">
-          <h3>Spectrum / energy</h3>
+          <h3>Спектр / энергия</h3>
           <p>Есть ли физически выделяемый сигнал?</p>
-          <p class="muted">snr / fft_peak / band_energy</p>
+          <p class="muted">snr · fft_peak · band_energy</p>
         </div>
         <div class="card">
-          <h3>Structure</h3>
+          <h3>Структура</h3>
           <p>Есть ли неслучайная структура?</p>
-          <p class="muted">autocorr / entropy / periodicity</p>
+          <p class="muted">autocorr · entropy · periodicity</p>
         </div>
       </div>
-      <p class="muted">Шесть независимых BPA → majority · mean · DST.</p>
+      <p class="muted">Шесть независимых BPA → большинство · среднее · DST.</p>
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Example · 6 sources</p>
+      <p class="eyebrow">Пример · 6 источников</p>
       <h2>Так выглядит один прогон</h2>
       <div class="viz compact">
         <div class="mass-row tight">
-          <span class="tag">snr</span>
+          <span class="tag">ОСШ</span>
           <div class="stack"><i class="s" style="width:100%"></i></div>
-          <span class="num">s</span>
+          <span class="num">сигнал</span>
         </div>
         <div class="mass-row tight">
-          <span class="tag">fft_peak</span>
+          <span class="tag">спектр.пик</span>
           <div class="stack"><i class="s" style="width:51%"></i><i class="n" style="width:35%"></i><i class="u" style="width:14%"></i></div>
-          <span class="num">~</span>
+          <span class="num">смесь</span>
         </div>
         <div class="mass-row tight">
-          <span class="tag">band_energy</span>
+          <span class="tag">энергия</span>
           <div class="stack"><i class="s" style="width:100%"></i></div>
-          <span class="num">s</span>
+          <span class="num">сигнал</span>
         </div>
         <div class="mass-row tight">
-          <span class="tag">autocorr</span>
+          <span class="tag">автокорр.</span>
           <div class="stack"><i class="s" style="width:43%"></i><i class="n" style="width:44%"></i><i class="u" style="width:13%"></i></div>
-          <span class="num">~</span>
+          <span class="num">смесь</span>
         </div>
         <div class="mass-row tight">
-          <span class="tag">entropy</span>
+          <span class="tag">энтропия</span>
           <div class="stack"><i class="s" style="width:2%"></i><i class="n" style="width:9%"></i><i class="u" style="width:89%"></i></div>
           <span class="num">Θ</span>
         </div>
         <div class="mass-row tight">
-          <span class="tag">periodicity</span>
+          <span class="tag">период.</span>
           <div class="stack"><i class="s" style="width:81%"></i><i class="n" style="width:19%"></i></div>
-          <span class="num">s</span>
+          <span class="num">сигнал</span>
         </div>
         <div class="fuse-line">
           <div class="mass-row tight">
-            <span class="tag">majority</span>
+            <span class="tag">большинство</span>
             <div class="stack"><i class="s" style="width:67%"></i><i class="n" style="width:33%"></i></div>
-            <span class="num">signal</span>
+            <span class="num">сигнал</span>
           </div>
           <div class="mass-row tight">
             <span class="tag">DST</span>
             <div class="stack"><i class="s" style="width:100%"></i></div>
-            <span class="num warn">K↑</span>
+            <span class="num warn">K ↑</span>
           </div>
         </div>
         <div class="legend">
-          <span class="ls">signal</span><span class="ln">noise</span><span class="lu">unknown</span>
+          <span class="ls">сигнал</span><span class="ln">шум</span><span class="lu">незнание</span>
           <span>голоса спокойны · DST поднимает конфликт</span>
         </div>
       </div>
@@ -171,29 +171,29 @@
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Frame</p>
-      <h2>Θ = {signal, noise}</h2>
+      <p class="eyebrow">Рамка</p>
+      <h2>Θ = {сигнал, шум}</h2>
       <p>Третьей гипотезы нет.</p>
       <p><code>unknown</code> в BPA — это <span class="accent">m(Θ)</span>, масса незнания. Не класс «неизвестно».</p>
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Evidence</p>
+      <p class="eyebrow">Свидетельства</p>
       <h2>Каждый детектор → BPA</h2>
       <div class="viz">
         <div class="mass-row">
           <span class="tag">пример</span>
-          <div class="stack" title="signal 0.60 · noise 0.15 · unknown 0.25" aria-hidden="true">
+          <div class="stack" title="сигнал 0.60 · шум 0.15 · незнание 0.25" aria-hidden="true">
             <i class="s" style="width:60%"></i>
             <i class="n" style="width:15%"></i>
             <i class="u" style="width:25%"></i>
           </div>
-          <span class="num">sum = 1</span>
+          <span class="num">сумма = 1</span>
         </div>
         <div class="legend">
-          <span class="ls">signal 0.60</span>
-          <span class="ln">noise 0.15</span>
-          <span class="lu">unknown / m(Θ) 0.25</span>
+          <span class="ls">сигнал 0.60</span>
+          <span class="ln">шум 0.15</span>
+          <span class="lu">незнание / m(Θ) 0.25</span>
         </div>
       </div>
       <p class="muted">Низкая уверенность → больше жёлтого (Θ), а не «натянуть 0.99».</p>
@@ -204,7 +204,7 @@
       <h2>Bel · Pl · K</h2>
       <div class="belpl">
         <div class="card">
-          <h3>Bel(signal) = m(signal)</h3>
+          <h3>Bel(сигнал) = m(сигнал)</h3>
           <p>Уже отдано гипотезе.</p>
           <div class="range" aria-hidden="true">
             <div class="bel" style="width:60%"></div>
@@ -212,7 +212,7 @@
           <div class="range-cap"><span>0</span><span>Bel</span><span>1</span></div>
         </div>
         <div class="card">
-          <h3>Pl(signal) = m(s) + m(Θ)</h3>
+          <h3>Pl(сигнал) = m(с) + m(Θ)</h3>
           <p>Ещё не противоречит.</p>
           <div class="range" aria-hidden="true">
             <div class="bel" style="width:60%"></div>
@@ -224,12 +224,12 @@
       <div class="k-meter" style="margin-top:.5rem">
         <p style="margin-bottom:.4rem"><span class="warn">K</span> — конфликт до нормировки Демпстера</p>
         <div class="track"><div class="fill" style="width:50%"></div></div>
-        <div class="labels"><span>0 согласны</span><span>1 отказ комбинации</span></div>
+        <div class="labels"><span>0 — согласны</span><span>1 — отказ комбинации</span></div>
       </div>
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Dempster</p>
+      <p class="eyebrow">Демпстер</p>
       <h2>Как сливаются массы</h2>
       <div class="flow">
         <div class="box">m₁</div>
@@ -240,12 +240,12 @@
         <span class="arrow">→</span>
         <div class="box accent">m₁₂</div>
       </div>
-      <p>Согласие усиливает signal/noise. Конфликт растёт в <span class="warn">K</span>.</p>
+      <p>Согласие усиливает сигнал или шум. Конфликт растёт в <span class="warn">K</span>.</p>
       <p class="muted">Если K → 1, комбинация отказана — вердикт пишет команда.</p>
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Example 1 · agree</p>
+      <p class="eyebrow">Пример 1 · согласие</p>
       <h2>DST усиливает согласие</h2>
       <div class="viz">
         <div class="mass-row">
@@ -259,7 +259,7 @@
           <span class="num">0.50/0.10/0.40</span>
         </div>
         <div class="mass-row">
-          <span class="tag">mean</span>
+          <span class="tag">среднее</span>
           <div class="stack"><i class="s" style="width:55%"></i><i class="n" style="width:10%"></i><i class="u" style="width:35%"></i></div>
           <span class="num">0.55/0.10/0.35</span>
         </div>
@@ -269,16 +269,16 @@
           <span class="num accent">0.78/0.09/0.13</span>
         </div>
         <div class="legend">
-          <span class="ls">signal</span><span class="ln">noise</span><span class="lu">unknown</span>
+          <span class="ls">сигнал</span><span class="ln">шум</span><span class="lu">незнание</span>
           <span>K ≈ 0.11</span>
         </div>
       </div>
-      <p class="muted">Unknown падает. Mean так не делает.</p>
+      <p class="muted">Незнание падает. Среднее так не делает.</p>
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Example 2 · conflict</p>
-      <h2>Mean спокоен. DST нет.</h2>
+      <p class="eyebrow">Пример 2 · конфликт</p>
+      <h2>Среднее спокойно. DST — нет.</h2>
       <div class="viz">
         <div class="mass-row">
           <span class="tag">m1</span>
@@ -291,7 +291,7 @@
           <span class="num">0.10/0.70/0.20</span>
         </div>
         <div class="mass-row">
-          <span class="tag">mean</span>
+          <span class="tag">среднее</span>
           <div class="stack"><i class="s" style="width:40%"></i><i class="n" style="width:40%"></i><i class="u" style="width:20%"></i></div>
           <span class="num">0.40/0.40/0.20</span>
         </div>
@@ -305,26 +305,26 @@
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Canon</p>
+      <p class="eyebrow">Канон</p>
       <h2>Шесть BPA, потом DST</h2>
-      <p>Каждый детектор отдаёт свою массу. Mean — среднее, не DST.</p>
-      <p>Канон сдачи: <span class="accent">Dempster на всех шести</span>.</p>
-      <p class="muted">Majority и mean рядом — чтобы сравнить, не заменить DST.</p>
+      <p>Каждый детектор отдаёт свою массу. Среднее — среднее, не DST.</p>
+      <p>Канон сдачи: <span class="accent">Демпстер на всех шести</span>.</p>
+      <p class="muted">Большинство и среднее рядом — чтобы сравнить, не заменить DST.</p>
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Baselines</p>
+      <p class="eyebrow">Базовые линии</p>
       <h2>Три числа на одном наборе</h2>
       <ul>
-        <li><span class="accent">majority</span> — голоса hard-label</li>
+        <li><span class="accent">majority</span> — голоса жёстких меток</li>
         <li><span class="accent">mean</span> — среднее BPA</li>
         <li><span class="accent">DST</span> — комбинация Демпстера</li>
       </ul>
-      <p>Ищите кейс, где majority спокоен, а DST поднимает K. Такое бывает не на каждом файле.</p>
+      <p>Ищите кейс, где большинство спокойно, а DST поднимает K. Такое бывает не на каждом файле.</p>
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Policy</p>
+      <p class="eyebrow">Политика</p>
       <h2>Автомат предлагает. Команда решает.</h2>
       <ul>
         <li><code>DECIDE</code> — Bel достаточен, конфликт невысокий</li>
@@ -335,8 +335,8 @@
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Hand-in</p>
-      <h2>Что сдать по observation</h2>
+      <p class="eyebrow">Сдача</p>
+      <h2>Что сдать по наблюдению</h2>
       <ul>
         <li>BPA шести детекторов</li>
         <li>majority / mean / DST + Bel, Pl, K, m(Θ)</li>
@@ -347,7 +347,7 @@
     </section>
 
     <section class="slide">
-      <p class="eyebrow">T+10 min</p>
+      <p class="eyebrow">Через 10 минут</p>
       <h2>Старт</h2>
       <p><code>cd participant && pip install -r requirements.txt</code></p>
       <p><code>python generator_example.py</code></p>
@@ -357,12 +357,12 @@
 
     <section class="slide">
       <p class="eyebrow">ARRAY-7</p>
-      <h1>The desk<br>decides.</h1>
+      <h1>Стол<br>решает.</h1>
       <p class="muted">Станция не классифицирует источники. Две группы — один kit. Кто первый сдаст раунд, тот и взял флаг.</p>
     </section>
   </main>
   <div class="bar">
-    <span>ARRAY-7 briefing</span>
+    <span>ARRAY-7 · брифинг</span>
     <span><span id="pos">1 / 13</span> · <kbd>←</kbd> <kbd>→</kbd> <kbd>F</kbd></span>
   </div>
   <script>
