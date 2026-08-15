@@ -365,6 +365,97 @@ select:focus {
   color: var(--muted);
 }
 
+.board-stage {
+  max-width: 56rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.board-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.board-table th,
+.board-table td {
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  padding: 0.65rem 0.85rem;
+  vertical-align: top;
+}
+
+.board-table th {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.board-table tr:last-child td {
+  border-bottom: none;
+}
+
+.ans-on {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.ans-off {
+  color: var(--muted);
+}
+
+.board-hint {
+  margin-top: 1rem;
+  font-size: 0.78rem;
+}
+
+.pipeline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.45rem;
+  margin: 1rem 0 1.25rem;
+}
+
+.pipeline-step {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  padding: 0.7rem 0.85rem;
+  min-width: 7.5rem;
+  flex: 1 1 7.5rem;
+}
+
+.pipeline-step strong {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+  font-weight: 500;
+}
+
+.pipeline-step span {
+  display: block;
+  color: var(--ink);
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.pipeline-arrow {
+  align-self: center;
+  color: var(--accent);
+  font-size: 1.1rem;
+  flex: 0 0 auto;
+}
+
 @keyframes rise {
   from {
     opacity: 0;

@@ -22,8 +22,10 @@
 
   <nav class="doc-nav" aria-label="Briefings">
     <a href="#intro" data-tab="intro">Intro</a>
+    <a href="#pipeline" data-tab="pipeline">Pipeline</a>
     <a href="#detectors" data-tab="detectors">Detectors</a>
     <a href="#dst" data-tab="dst">DST</a>
+    <a href="scoreboard.html">Rounds</a>
     <a href="briefing.html">Hall deck</a>
   </nav>
 
@@ -56,6 +58,29 @@ python main.py data/obs_s0.npy</pre>
         </tbody>
       </table>
       <p>Пороги в <code>decision.py</code> можно менять — выбор нужно защитить. ИИ разрешён. Метод нужно понимать. ИИ — не ground truth.</p>
+    </article>
+
+    <article id="pipeline">
+      <h2>Pipeline — модули kit</h2>
+      <p>Анализ только локально в <code>participant/</code>. Сайт waveform отдаёт, классификацию не считает.</p>
+      <div class="pipeline" aria-label="Participant pipeline">
+        <div class="pipeline-step"><strong>1 · load</strong><span><code>.npy</code> + meta <code>fs</code></span></div>
+        <div class="pipeline-arrow" aria-hidden="true">→</div>
+        <div class="pipeline-step"><strong>2 · detectors</strong><span>6 BPA в <code>detectors.py</code></span></div>
+        <div class="pipeline-arrow" aria-hidden="true">→</div>
+        <div class="pipeline-step"><strong>3 · baselines</strong><span>majority · mean · DST</span></div>
+        <div class="pipeline-arrow" aria-hidden="true">→</div>
+        <div class="pipeline-step"><strong>4 · metrics</strong><span>Bel / Pl / K / m(Θ)</span></div>
+        <div class="pipeline-arrow" aria-hidden="true">→</div>
+        <div class="pipeline-step"><strong>5 · policy</strong><span>DECIDE · HUMAN_REVIEW · OBSERVE_MORE</span></div>
+        <div class="pipeline-arrow" aria-hidden="true">→</div>
+        <div class="pipeline-step"><strong>6 · verdict</strong><span>команда пишет ответ</span></div>
+      </div>
+      <p>Канон сдачи — DST на всех шести BPA. Majority и mean рядом для сравнения.</p>
+      <pre>python main.py data/obs_s0.npy
+python main.py data/obs_s0.npy --plot
+python main.py data/obs_s0.npy --human</pre>
+      <p class="muted"><code>--plot</code> рисует BPA детекторов и Bel/K после текстового отчёта. Таблица раундов: <a href="scoreboard.html">Rounds</a>.</p>
     </article>
 
     <article id="detectors">

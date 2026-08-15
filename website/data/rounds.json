@@ -1,0 +1,60 @@
+{
+  "title": "ARRAY-7 round board",
+  "note": "After accepting a round, set answer_revealed=true for that row and redeploy. Never put plaintext bonus text here.",
+  "rounds": [
+    {
+      "round": 1,
+      "id": "obs_s0",
+      "label": "OBS-S0",
+      "focus": "калибровка",
+      "expected": "noise",
+      "note": "высокое m(Θ) → HUMAN_REVIEW допустим",
+      "answer_revealed": false
+    },
+    {
+      "round": 2,
+      "id": "obs_s1",
+      "label": "OBS-S1",
+      "focus": "согласие источников",
+      "expected": "signal",
+      "note": "majority ≈ mean ≈ DST",
+      "answer_revealed": false
+    },
+    {
+      "round": 3,
+      "id": "obs_s4",
+      "label": "OBS-S4",
+      "focus": "конфликт / высокий K",
+      "expected": "signal",
+      "note": "HUMAN_REVIEW из‑за K; не noise",
+      "answer_revealed": false
+    },
+    {
+      "round": 4,
+      "id": "obs_s3",
+      "label": "OBS-S3",
+      "focus": "majority ≠ DST",
+      "expected": "signal",
+      "note": "HUMAN_REVIEW / abstain ок при высоком K",
+      "answer_revealed": false
+    },
+    {
+      "round": 5,
+      "id": "obs_s2",
+      "label": "OBS-S2",
+      "focus": "структурированный сигнал",
+      "expected": "signal",
+      "note": "Θ остаётся бинарной",
+      "answer_revealed": false
+    },
+    {
+      "round": 6,
+      "id": "obs_s5",
+      "label": "OBS-S5",
+      "focus": "структура + бонус",
+      "expected": "signal",
+      "note": "бонус decode отдельно; текст сюда не писать",
+      "answer_revealed": false
+    }
+  ]
+}

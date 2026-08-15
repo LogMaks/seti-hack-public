@@ -14,9 +14,11 @@ pip install -r requirements.txt
 python generator_example.py
 python main.py data/example_noise.npy
 python main.py data/example_sine.npy
+python main.py data/example_sine.npy --plot
 ```
 
 Брифинги: [станция /docs.html](https://logmaks.github.io/seti-hack-public/docs.html) или [`../materials/INTRO.md`](../materials/INTRO.md).
+Таблица раундов: [Rounds](https://logmaks.github.io/seti-hack-public/scoreboard.html).
 
 ## Канон
 
@@ -40,7 +42,8 @@ python main.py data/example_sine.npy
               DECIDE | HUMAN_REVIEW | OBSERVE_MORE
 ```
 
-`OBSERVE_MORE` = ждать следующий раунд. `HUMAN_REVIEW` = команда пишет вердикт, не внешний эксперт. Вердикт: `python main.py FILE --human`.
+`OBSERVE_MORE` = ждать следующий раунд. `HUMAN_REVIEW` = команда пишет вердикт, не внешний эксперт. Вердикт: `python main.py FILE --human`.  
+Графики BPA и Bel/K после отчёта: `python main.py FILE --plot`.
 
 Пороги, признаки, score→BPA можно менять; метод нужно объяснить. ИИ разрешён, ground truth не выдаёт.
 

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ARRAY-7 — round board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="docs-body">
+  <div class="grain" aria-hidden="true"></div>
+  <header class="top">
+    <div class="brand-block">
+      <p class="eyebrow">Round board · live event</p>
+      <h1 class="brand brand-sm">ARRAY-7</h1>
+      <p class="tagline">Раунды и ответы после закрытия</p>
+    </div>
+    <a class="btn btn-ghost" href="index.html">Terminal</a>
+  </header>
+
+  <main class="stage prose board-stage">
+    <h2>Таблица раундов</h2>
+    <p class="muted" id="board-note">Загрузка…</p>
+    <div class="table-wrap">
+      <table class="board-table" id="board-table">
+        <thead>
+          <tr>
+            <th>Раунд</th>
+            <th>Observation</th>
+            <th>Фокус</th>
+            <th>Ответ</th>
+            <th>Заметка</th>
+          </tr>
+        </thead>
+        <tbody id="board-body"></tbody>
+      </table>
+    </div>
+    <p class="muted board-hint">
+      Ответ появляется только после того, как ведущий закроет раунд
+      (<code>answer_revealed</code> в <code>data/rounds.json</code>).
+      Сайт не анализирует сигнал.
+    </p>
+  </main>
+
+  <footer class="foot">
+    <p>ARRAY-7 does not classify sources. Answers are desk-controlled reveals, not live inference.</p>
+    <p class="desk-links">
+      <a href="index.html">Terminal</a>
+      <a href="docs.html">Intro</a>
+      <a href="docs.html#pipeline">Pipeline</a>
+      <a href="briefing.html">Hall deck</a>
+    </p>
+  </footer>
+
+  <script>
+    async function loadBoard() {
+      const note = document.getElementById("board-note");
+      const body = document.getElementById("board-body");
+      try {
+        const data = await fetch("data/rounds.json").then((r) => {
+          if (!r.ok) throw new Error("rounds.json missing");
+          return r.json();
+        });
+        note.textContent = data.note || "";
+        const rows = (data.rounds || []).slice().sort((a, b) => a.round - b.round);
+        body.innerHTML = "";
+        for (const r of rows) {
+          const tr = document.createElement("tr");
+          const ans = r.answer_revealed
+            ? `<span class="ans-on">${r.expected || "—"}</span>`
+            : `<span class="ans-off">pending</span>`;
+          const tip = r.answer_revealed ? (r.note || "—") : "—";
+          tr.innerHTML = `
+            <td>${r.round}</td>
+            <td>${r.label || r.id}</td>
+            <td>${r.focus || "—"}</td>
+            <td>${ans}</td>
+            <td>${tip}</td>`;
+          body.appendChild(tr);
+        }
+      } catch (err) {
+        note.textContent = String(err.message || err);
+      }
+    }
+    loadBoard();
+  </script>
+</body>
+</html>

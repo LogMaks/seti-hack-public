@@ -23,7 +23,21 @@ cd participant
 python main.py data/obs_s0.npy
 ```
 
-Порядок раундов задаёт организатор (не алфавит ID).
+Порядок раундов задаёт организатор (не алфавит ID).  
+Таблица раундов на станции: [Rounds](https://logmaks.github.io/seti-hack-public/scoreboard.html) — ответы появляются только после закрытия раунда ведущим.
+
+## Pipeline (модули kit)
+
+```text
+.npy → detectors.py (6 BPA)
+         → majority | mean | DST
+         → Bel / Pl / K / m(Θ)
+         → DECIDE | HUMAN_REVIEW | OBSERVE_MORE
+         → вердикт команды
+```
+
+На станции та же схема: [Pipeline](https://logmaks.github.io/seti-hack-public/docs.html#pipeline).  
+Локально: `python main.py FILE` и при желании `python main.py FILE --plot`.
 
 ## Что считать ответом (канон)
 
