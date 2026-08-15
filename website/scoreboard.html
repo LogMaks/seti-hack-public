@@ -15,7 +15,7 @@
     <div class="brand-block">
       <p class="eyebrow">Round board · live event</p>
       <h1 class="brand brand-sm">ARRAY-7</h1>
-      <p class="tagline">Раунды и ответы после закрытия</p>
+      <p class="tagline">Раунды · ответы команд · GT после закрытия</p>
     </div>
     <a class="btn btn-ghost" href="index.html">Terminal</a>
   </header>
@@ -30,6 +30,8 @@
             <th>Раунд</th>
             <th>Observation</th>
             <th>Фокус</th>
+            <th id="th-team-a">Команда A</th>
+            <th id="th-team-b">Команда B</th>
             <th>Ответ</th>
             <th>Заметка</th>
           </tr>
@@ -38,8 +40,8 @@
       </table>
     </div>
     <p class="muted board-hint">
-      Ответ появляется только после того, как ведущий закроет раунд
-      (<code>answer_revealed</code> в <code>data/rounds.json</code>).
+      Ведущий пишет вердикты команд в <code>team_a</code> / <code>team_b</code>.
+      Колонка «Ответ» (expected) открывается только при <code>answer_revealed: true</code>.
       Сайт не анализирует сигнал.
     </p>
   </main>
@@ -55,6 +57,12 @@
   </footer>
 
   <script>
+    function cellTeam(val) {
+      const t = (val == null ? "" : String(val)).trim();
+      if (!t) return `<span class="ans-off">—</span>`;
+      return `<span class="ans-team">${t}</span>`;
+    }
+
     async function loadBoard() {
       const note = document.getElementById("board-note");
       const body = document.getElementById("board-body");
@@ -64,6 +72,10 @@
           return r.json();
         });
         note.textContent = data.note || "";
+        if (data.teams) {
+          if (data.teams.a) document.getElementById("th-team-a").textContent = data.teams.a;
+          if (data.teams.b) document.getElementById("th-team-b").textContent = data.teams.b;
+        }
         const rows = (data.rounds || []).slice().sort((a, b) => a.round - b.round);
         body.innerHTML = "";
         for (const r of rows) {
@@ -76,6 +88,8 @@
             <td>${r.round}</td>
             <td>${r.label || r.id}</td>
             <td>${r.focus || "—"}</td>
+            <td>${cellTeam(r.team_a)}</td>
+            <td>${cellTeam(r.team_b)}</td>
             <td>${ans}</td>
             <td>${tip}</td>`;
           body.appendChild(tr);

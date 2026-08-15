@@ -411,6 +411,11 @@ select:focus {
   color: var(--muted);
 }
 
+.ans-team {
+  color: var(--ink);
+  font-weight: 500;
+}
+
 .board-hint {
   margin-top: 1rem;
   font-size: 0.78rem;
