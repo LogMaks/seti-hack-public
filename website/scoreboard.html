@@ -15,7 +15,7 @@
     <div class="brand-block">
       <p class="eyebrow">Round board · live event</p>
       <h1 class="brand brand-sm">ARRAY-7</h1>
-      <p class="tagline">Раунды · ответы команд · GT после закрытия</p>
+      <p class="tagline">Раунды · 1 очко за верный вердикт</p>
     </div>
     <a class="btn btn-ghost" href="index.html">Terminal</a>
   </header>
@@ -23,6 +23,20 @@
   <main class="stage prose board-stage">
     <h2>Таблица раундов</h2>
     <p class="muted" id="board-note">Загрузка…</p>
+
+    <div class="score-strip" id="score-strip" hidden>
+      <div class="score-card">
+        <span class="score-label" id="score-label-a">Команда A</span>
+        <strong class="score-val" id="score-a">0</strong>
+        <span class="score-unit">очк.</span>
+      </div>
+      <div class="score-card">
+        <span class="score-label" id="score-label-b">Команда B</span>
+        <strong class="score-val" id="score-b">0</strong>
+        <span class="score-unit">очк.</span>
+      </div>
+    </div>
+
     <div class="table-wrap">
       <table class="board-table" id="board-table">
         <thead>
@@ -40,8 +54,8 @@
       </table>
     </div>
     <p class="muted board-hint">
-      Ведущий пишет вердикты команд в <code>team_a</code> / <code>team_b</code>.
-      Колонка «Ответ» (expected) открывается только при <code>answer_revealed: true</code>.
+      Ведущий пишет вердикты в <code>team_a</code> / <code>team_b</code>.
+      После <code>answer_revealed: true</code> совпадение с <code>expected</code> даёт <strong>+1</strong> очко.
       Сайт не анализирует сигнал.
     </p>
   </main>
@@ -57,43 +71,70 @@
   </footer>
 
   <script>
-    function cellTeam(val) {
+    function norm(val) {
+      return (val == null ? "" : String(val)).trim().toLowerCase();
+    }
+
+    function cellTeam(val, expected, revealed) {
       const t = (val == null ? "" : String(val)).trim();
       if (!t) return `<span class="ans-off">—</span>`;
-      return `<span class="ans-team">${t}</span>`;
+      if (!revealed || !expected) {
+        return `<span class="ans-team">${t}</span>`;
+      }
+      const ok = norm(t) === norm(expected);
+      if (ok) {
+        return `<span class="ans-hit">${t} <small>+1</small></span>`;
+      }
+      return `<span class="ans-miss">${t}</span>`;
     }
 
     async function loadBoard() {
       const note = document.getElementById("board-note");
       const body = document.getElementById("board-body");
+      const strip = document.getElementById("score-strip");
       try {
         const data = await fetch("data/rounds.json").then((r) => {
           if (!r.ok) throw new Error("rounds.json missing");
           return r.json();
         });
         note.textContent = data.note || "";
-        if (data.teams) {
-          if (data.teams.a) document.getElementById("th-team-a").textContent = data.teams.a;
-          if (data.teams.b) document.getElementById("th-team-b").textContent = data.teams.b;
-        }
+        const nameA = (data.teams && data.teams.a) || "Команда A";
+        const nameB = (data.teams && data.teams.b) || "Команда B";
+        document.getElementById("th-team-a").textContent = nameA;
+        document.getElementById("th-team-b").textContent = nameB;
+        document.getElementById("score-label-a").textContent = nameA;
+        document.getElementById("score-label-b").textContent = nameB;
+
         const rows = (data.rounds || []).slice().sort((a, b) => a.round - b.round);
+        let scoreA = 0;
+        let scoreB = 0;
         body.innerHTML = "";
         for (const r of rows) {
-          const tr = document.createElement("tr");
-          const ans = r.answer_revealed
-            ? `<span class="ans-on">${r.expected || "—"}</span>`
+          const revealed = !!r.answer_revealed;
+          const expected = r.expected || "";
+          if (revealed && expected) {
+            if (norm(r.team_a) && norm(r.team_a) === norm(expected)) scoreA += 1;
+            if (norm(r.team_b) && norm(r.team_b) === norm(expected)) scoreB += 1;
+          }
+          const ans = revealed
+            ? `<span class="ans-on">${expected || "—"}</span>`
             : `<span class="ans-off">pending</span>`;
-          const tip = r.answer_revealed ? (r.note || "—") : "—";
+          const tip = revealed ? (r.note || "—") : "—";
+          const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${r.round}</td>
             <td>${r.label || r.id}</td>
             <td>${r.focus || "—"}</td>
-            <td>${cellTeam(r.team_a)}</td>
-            <td>${cellTeam(r.team_b)}</td>
+            <td>${cellTeam(r.team_a, expected, revealed)}</td>
+            <td>${cellTeam(r.team_b, expected, revealed)}</td>
             <td>${ans}</td>
             <td>${tip}</td>`;
           body.appendChild(tr);
         }
+
+        document.getElementById("score-a").textContent = String(scoreA);
+        document.getElementById("score-b").textContent = String(scoreB);
+        strip.hidden = false;
       } catch (err) {
         note.textContent = String(err.message || err);
       }

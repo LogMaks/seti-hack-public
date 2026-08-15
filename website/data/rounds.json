@@ -1,6 +1,6 @@
 {
   "title": "ARRAY-7 round board",
-  "note": "Fill team_a / team_b as desks submit. Set answer_revealed=true after the round closes. Never put plaintext bonus text here.",
+  "note": "Fill team_a / team_b as desks submit. After answer_revealed=true, matching expected = +1 point each. Never put plaintext bonus text here.",
   "teams": {
     "a": "Команда A",
     "b": "Команда B"
