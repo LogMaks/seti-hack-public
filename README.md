@@ -2,7 +2,8 @@
 
 Публичные материалы образовательного хака: сигнал или шум (DST) + бонус — зашифрованный текст.
 
-**Станция ARRAY-7 (GitHub Pages):** https://logmaks.github.io/seti-hack-public/
+**Станция ARRAY-7 (GitHub Pages):** https://logmaks.github.io/seti-hack-public/  
+**Participant kit:** https://github.com/LogMaks/seti-hack-public/tree/main/participant
 
 ```text
 seti-hack-public/
