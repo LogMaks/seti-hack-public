@@ -45,6 +45,15 @@ python main.py data/example_sine.npy --plot
 `OBSERVE_MORE` = ждать следующий раунд. `HUMAN_REVIEW` = команда пишет вердикт, не внешний эксперт. Вердикт: `python main.py FILE --human`.  
 Графики BPA и Bel/K после отчёта: `python main.py FILE --plot`.
 
+Бонус (если дошли до структуры в потоке): несущую берут из спектра (`--f0`), длину символа часто ищут так:
+
+```bash
+python decode_bonus.py data/obs_s5.npy --f0 YOUR_HZ --scan-spb
+python decode_bonus.py data/obs_s5.npy --f0 YOUR_HZ --spb YOUR_SPB
+```
+
+`--scan-spb` перебирает длины с целым числом периодов несущей на бит — типичный затык на хаке.
+
 Пороги, признаки, score→BPA можно менять; метод нужно объяснить. ИИ разрешён, ground truth не выдаёт.
 
 Зависимости: Python 3.10+, NumPy, SciPy, Matplotlib. Скачанные наблюдения — в `data/`.
