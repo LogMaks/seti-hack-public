@@ -1,6 +1,6 @@
 # SETI / DST Hack — participant kit
 
-Неизвестный сигнал. **Основное:** это сигнал или шум? A — спектр, B — структура, DST сливает, решают команды.
+Неизвестный сигнал. **Основное:** это сигнал или шум? Шесть детекторов дают evidence, DST сливает, команда решает.
 
 **Бонус:** в потоке может быть зашифрованный текст. Найти и прочитать — плюс, не замена сдачи.
 
@@ -22,12 +22,11 @@ python main.py data/example_sine.npy
 
 Θ = {signal, noise}. `unknown` в BPA — это **m(Θ)**, не третий класс.
 
-1. Team A / Team B → свои BPA (`detectors_a.py` / `detectors_b.py`).  
-2. Внутри команды — mean BPA.  
-3. **Сдача:** majority · mean · DST на двух team means (A vs B), плюс Bel / Pl / K / политика.  
-4. Все 6 детекторов в выводе `main.py` — диагностика.
+1. Шесть детекторов → шесть BPA (`detectors.py`).  
+2. **Сдача:** majority · mean · DST на этих шести BPA, плюс Bel / Pl / K / политика.  
+3. Команда одна. Соревнуются две группы на живом хаке — kit у обеих одинаковый.
 
-При K → 1 комбинация отказана, политика → `HUMAN_REVIEW`: автомат молчит, вердикт пишут команды (не traceback).  
+При K → 1 комбинация отказана, политика → `HUMAN_REVIEW`: автомат молчит, вердикт пишет команда (не traceback).  
 `max K` — максимум последовательных pairwise K, учебный прокси.
 
 Ищите случаи, где majority/mean спокойны, а DST поднимает K — не на каждом файле.
@@ -35,14 +34,13 @@ python main.py data/example_sine.npy
 ## Pipeline
 
 ```text
-.npy → A: SNR/FFT/band     B: autocorr/entropy/periodicity
-         BPA                      BPA
-              mean A  +  mean B  →  majority | mean | DST
-                                  Bel / Pl / K / m(Θ)
-                                  DECIDE | HUMAN_REVIEW | OBSERVE_MORE
+.npy → 6 detectors → 6 BPA
+              majority | mean | DST
+              Bel / Pl / K / m(Θ)
+              DECIDE | HUMAN_REVIEW | OBSERVE_MORE
 ```
 
-`OBSERVE_MORE` = ждать следующий раунд. `HUMAN_REVIEW` = спор команд, не внешний эксперт. Вердикт: `python main.py FILE --human`.
+`OBSERVE_MORE` = ждать следующий раунд. `HUMAN_REVIEW` = команда пишет вердикт, не внешний эксперт. Вердикт: `python main.py FILE --human`.
 
 Пороги, признаки, score→BPA можно менять; метод нужно объяснить. ИИ разрешён, ground truth не выдаёт.
 

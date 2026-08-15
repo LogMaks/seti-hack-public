@@ -45,7 +45,7 @@
     <section class="slide">
       <p class="eyebrow">Mission</p>
       <h2>Сигнал или шум?</h2>
-      <p>Команда A смотрит спектр. Команда B — структуру. DST сливает числа. Решают сами команды.</p>
+      <p>Шесть детекторов снимают evidence. DST сливает числа. Решает сама команда.</p>
       <p class="muted">Это основное. Легкий слой. Его сдают всегда.</p>
     </section>
 
@@ -66,16 +66,16 @@
     </section>
 
     <section class="slide">
-      <p class="eyebrow">Two desks</p>
-      <h2>Две команды — два вопроса</h2>
+      <p class="eyebrow">Six sources</p>
+      <h2>Одна команда — шесть детекторов</h2>
       <div class="grid">
         <div class="card">
-          <h3>Team A · spectral</h3>
+          <h3>Spectrum / energy</h3>
           <p>Есть ли физически выделяемый сигнал?</p>
-          <p class="muted">SNR / FFT peak / band energy</p>
+          <p class="muted">snr / fft_peak / band_energy</p>
         </div>
         <div class="card">
-          <h3>Team B · structure</h3>
+          <h3>Structure</h3>
           <p>Есть ли неслучайная структура?</p>
           <p class="muted">autocorr / entropy / periodicity</p>
         </div>
@@ -104,13 +104,13 @@
         <li><span class="accent">Pl</span> — сколько ещё ей не противоречит</li>
         <li><span class="accent">K</span> — конфликт до нормировки Демпстера</li>
       </ul>
-      <p class="muted">Правило — классический Dempster. Если K → 1, комбинация отказана — спор команд, не внешний эксперт.</p>
+      <p class="muted">Правило — классический Dempster. Если K → 1, комбинация отказана — вердикт пишет команда, не внешний эксперт.</p>
     </section>
 
     <section class="slide">
       <p class="eyebrow">Example 1 · agree</p>
       <h2>DST усиливает согласие</h2>
-      <p>A <code>0.60 / 0.10 / 0.30</code> · B <code>0.50 / 0.10 / 0.40</code></p>
+      <p>m1 <code>0.60 / 0.10 / 0.30</code> · m2 <code>0.50 / 0.10 / 0.40</code></p>
       <p>mean → <code>0.55 / 0.10 / 0.35</code></p>
       <p>DST, K=0.11 → <span class="accent">0.78 / 0.09 / 0.13</span></p>
       <p class="muted">Unknown падает. Mean так не делает.</p>
@@ -119,18 +119,18 @@
     <section class="slide">
       <p class="eyebrow">Example 2 · conflict</p>
       <h2>Mean спокоен. DST нет.</h2>
-      <p>A <code>0.70 / 0.10 / 0.20</code> · B <code>0.10 / 0.70 / 0.20</code></p>
+      <p>m1 <code>0.70 / 0.10 / 0.20</code> · m2 <code>0.10 / 0.70 / 0.20</code></p>
       <p>majority / mean → ничья <code>0.40 / 0.40 / 0.20</code></p>
-      <p>DST, K=0.50 → <span class="warn">HUMAN_REVIEW</span> — вердикт пишут команды</p>
+      <p>DST, K=0.50 → <span class="warn">HUMAN_REVIEW</span> — вердикт пишет команда</p>
       <p class="muted">Это учебный кейс хака. K→1 — комбинация отказана.</p>
     </section>
 
     <section class="slide">
       <p class="eyebrow">Canon</p>
-      <h2>Сначала команды, потом DST</h2>
-      <p>Mean BPA внутри A и внутри B (это не DST).</p>
-      <p>Канон сдачи: <span class="accent">Dempster на A vs B</span>.</p>
-      <p class="muted">Все 6 детекторов сразу — диагностика, не ответ.</p>
+      <h2>Шесть BPA, потом DST</h2>
+      <p>Каждый детектор отдаёт свою массу. Mean — среднее, не DST.</p>
+      <p>Канон сдачи: <span class="accent">Dempster на всех шести</span>.</p>
+      <p class="muted">Majority и mean рядом — чтобы сравнить, не заменить DST.</p>
     </section>
 
     <section class="slide">
@@ -146,10 +146,10 @@
 
     <section class="slide">
       <p class="eyebrow">Policy</p>
-      <h2>Автомат предлагает. Команды решают.</h2>
+      <h2>Автомат предлагает. Команда решает.</h2>
       <ul>
         <li><code>DECIDE</code> — Bel достаточен, конфликт невысокий</li>
-        <li><code class="warn">HUMAN_REVIEW</code> — спор A vs B, высокий K или m(Θ)</li>
+        <li><code class="warn">HUMAN_REVIEW</code> — высокий K или m(Θ), команда пишет вердикт</li>
         <li><code>OBSERVE_MORE</code> — слабо / ничья, ждать раунд</li>
       </ul>
       <p class="muted">Внешнего судьи нет. Пороги в decision.py можно менять — защитите выбор.</p>
@@ -159,9 +159,9 @@
       <p class="eyebrow">Hand-in</p>
       <h2>Что сдать по observation</h2>
       <ul>
-        <li>BPA или team means</li>
+        <li>BPA шести детекторов</li>
         <li>majority / mean / DST + Bel, Pl, K, m(Θ)</li>
-        <li>действие политики и вердикт команд</li>
+        <li>действие политики и вердикт команды</li>
         <li>3–5 предложений «почему»</li>
       </ul>
       <p class="muted">ИИ разрешён. Текст в потоке — бонус, не замена этой сдачи.</p>
@@ -178,8 +178,8 @@
 
     <section class="slide">
       <p class="eyebrow">ARRAY-7</p>
-      <h1>The desks<br>decide.</h1>
-      <p class="muted">Станция не классифицирует источники. Это соревнование двух команд.</p>
+      <h1>The desk<br>decides.</h1>
+      <p class="muted">Станция не классифицирует источники. Две группы — один kit. Кто первый сдаст раунд, тот и взял флаг.</p>
     </section>
   </main>
   <div class="bar">

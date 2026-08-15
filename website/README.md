@@ -10,7 +10,7 @@ python3 -m http.server 8765
 Listen to source — крутит текущий `.npy` как звук (тот же waveform, цикл, курсор на осциллографе).
 
 Брифинг для зала: открыть `briefing.html` (стрелки / пробел, `F` — полный экран).  
-Desk notes: `docs.html` — Intro / Team A / Team B / DST.
+Desk notes: `docs.html` — Intro / Detectors / DST.
 
 ## Выдача раундов
 

@@ -8,7 +8,7 @@
 seti-hack-public/
 ├── participant/     # Python baseline
 ├── website/         # ARRAY-7 observation terminal (static)
-└── materials/       # INTRO, TEAM_A/B, DST cheatsheet
+└── materials/       # INTRO, DETECTORS, DST cheatsheet
 ```
 
 ## Participant

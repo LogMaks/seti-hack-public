@@ -35,9 +35,9 @@ seti-hack-organizer/   ← отдельный приватный корень / 
 | Θ | `{signal, noise}` + `m(Θ)` как ключ `unknown` |
 | DST | классический Dempster |
 | Baselines | majority · mean BPA · DST |
-| Политика | K / m(Θ) / Bel → DECIDE \| HUMAN_REVIEW (спор команд) \| OBSERVE_MORE |
-| Канон | DST на team-mean A vs B; все 6 детекторов — диагностика |
-| K→1 | комбинация отказана → HUMAN_REVIEW (вердикт команд), не traceback |
+| Политика | K / m(Θ) / Bel → DECIDE \| HUMAN_REVIEW (вердикт команды) \| OBSERVE_MORE |
+| Канон | DST на всех 6 детекторах; majority / mean рядом для сравнения |
+| K→1 | комбинация отказана → HUMAN_REVIEW (вердикт команды), не traceback |
 | S2 | объяснимый структурированный сигнал, не третий класс в коде |
 | Spectrogram на сайте | не нужен в MVP |
 | Конфликт | искать кейс, где majority/mean «спокойны», а DST поднимает K / ведёт в HUMAN_REVIEW — не обещать это на каждом файле |
@@ -49,9 +49,9 @@ seti-hack-organizer/   ← отдельный приватный корень / 
 ## 4. Что уже в этом репо
 
 ### `participant/`
-- `dst.py`, `decision.py`, `detectors_a.py`, `detectors_b.py`
+- `dst.py`, `decision.py`, `detectors.py`
 - `io_utils.py`, `generator_example.py` (toy noise/sine)
-- `main.py` — вердикт команд через `--human`
+- `main.py` — вердикт команды через `--human`
 
 ```bash
 cd participant
@@ -69,7 +69,7 @@ python main.py data/example_sine.npy
 - `?all=1` — отладка организатора
 
 ### `materials/`
-- `INTRO.md`, `TEAM_A.md`, `TEAM_B.md`, `DST_CHEATSHEET.md`
+- `INTRO.md`, `DETECTORS.md`, `DST_CHEATSHEET.md`
 
 ```bash
 cd website && python3 -m http.server 8765

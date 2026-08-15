@@ -1,8 +1,8 @@
 """
-Baselines + team policy. Canon fusion is team-mean A vs B (see main.py).
+Baselines + team policy. Canon fusion is DST on all six detector BPAs.
 
 majority / mean score / Dempster, then:
-  high K or high m(Θ) → HUMAN_REVIEW (teams write the verdict)
+  high K or high m(Θ) → HUMAN_REVIEW (the team writes the verdict)
   weak / tied belief → OBSERVE_MORE
   else → DECIDE(signal|noise)
 """

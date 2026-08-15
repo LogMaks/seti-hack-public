@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-One observation: load → A/B detectors → majority / mean / DST → team policy.
+One observation: load → 6 detectors → majority / mean / DST → team policy.
 
-Canon: DST on team-mean A vs team-mean B. All-6 detectors are diagnostics.
+Canon: DST on all six detector BPAs.
 
     python generator_example.py
     python main.py data/example_noise.npy
@@ -15,9 +15,8 @@ import argparse
 from pathlib import Path
 
 from decision import compare_baselines, human_review_prompt
-from detectors_a import DETECTOR_NAMES_A, run_team_a
-from detectors_b import DETECTOR_NAMES_B, run_team_b
-from dst import mean_bpa, summarize
+from detectors import DETECTOR_NAMES, run_detectors
+from dst import summarize
 from io_utils import load_observation
 
 
@@ -32,43 +31,27 @@ def _fmt_dst(dst: dict) -> str:
     return f"{dst['decision']}  {_fmt_bpa(dst['mass'])}  K={k:.3f}"
 
 
-def _print_baselines(title: str, report: dict, votes: bool = False) -> None:
-    print(f"\n--- {title} ---")
-    extra = f"  {report['majority']['votes']}" if votes else ""
-    print(f"  majority → {report['majority']['decision']}{extra}")
+def analyze(path: Path, ask_human: bool = False) -> dict:
+    x, meta = load_observation(path)
+    fs = float(meta.get("fs", 8000.0))
+    masses = run_detectors(x, fs)
+
+    print(f"\nObservation: {meta.get('id', path.name)}  n={len(x)}  fs={fs}")
+    print("\n--- Detectors (6 sources) ---")
+    for name, m in zip(DETECTOR_NAMES, masses):
+        print(f"  {name:12s}  {_fmt_bpa(m)}")
+
+    report = compare_baselines(masses)
+    print("\n--- Baselines ---")
+    print(f"  majority → {report['majority']['decision']}  {report['majority']['votes']}")
     print(f"  mean     → {report['mean']['decision']}  {_fmt_bpa(report['mean']['mass'])}")
     print(f"  DST      → {_fmt_dst(report['dst'])}")
     print(f"  policy   → {report['policy']}")
 
-
-def analyze(path: Path, ask_human: bool = False) -> dict:
-    x, meta = load_observation(path)
-    fs = float(meta.get("fs", 8000.0))
-    bpa_a = run_team_a(x, fs)
-    bpa_b = run_team_b(x, fs)
-
-    print(f"\nObservation: {meta.get('id', path.name)}  n={len(x)}  fs={fs}")
-    print("\n--- Team A (spectral) ---")
-    for name, m in zip(DETECTOR_NAMES_A, bpa_a):
-        print(f"  {name:12s}  {_fmt_bpa(m)}")
-    print("\n--- Team B (structure) ---")
-    for name, m in zip(DETECTOR_NAMES_B, bpa_b):
-        print(f"  {name:12s}  {_fmt_bpa(m)}")
-
-    team_a, team_b = mean_bpa(bpa_a), mean_bpa(bpa_b)
-    print("\n--- Team means ---")
-    print(f"  A mean       {_fmt_bpa(team_a)}")
-    print(f"  B mean       {_fmt_bpa(team_b)}")
-
-    report_teams = compare_baselines([team_a, team_b])
-    report_all = compare_baselines(bpa_a + bpa_b)
-    _print_baselines("Canon: DST on team means (A vs B)", report_teams)
-    _print_baselines("Diagnostics: all 6 detectors", report_all, votes=True)
-
-    fused = report_teams["dst"]["mass"]
+    fused = report["dst"]["mass"]
     if fused is not None:
         s = summarize(fused)
-        print("\n--- Bel / Pl (canon DST) ---")
+        print("\n--- Bel / Pl (DST) ---")
         print(f"  Bel {s['belief']}")
         print(f"  Pl  {s['plausibility']}")
     else:
@@ -76,24 +59,17 @@ def analyze(path: Path, ask_human: bool = False) -> dict:
 
     human = None
     if ask_human:
-        human = human_review_prompt(str(meta.get("id", path.name)), report_teams)
-    elif report_teams["policy"]["action"] == "HUMAN_REVIEW":
-        print("\n(teams should write a verdict — re-run with --human)")
+        human = human_review_prompt(str(meta.get("id", path.name)), report)
+    elif report["policy"]["action"] == "HUMAN_REVIEW":
+        print("\n(write a team verdict — re-run with --human)")
 
-    return {
-        "meta": meta,
-        "team_a": team_a,
-        "team_b": team_b,
-        "report_all": report_all,
-        "report_teams": report_teams,
-        "human": human,
-    }
+    return {"meta": meta, "masses": masses, "report": report, "human": human}
 
 
 def main() -> None:
     p = argparse.ArgumentParser(description="SETI/DST hack — analyze one observation")
     p.add_argument("observation", type=Path, help="path to .npy observation")
-    p.add_argument("--human", action="store_true", help="enter team verdict (A vs B review)")
+    p.add_argument("--human", action="store_true", help="enter team verdict")
     args = p.parse_args()
     analyze(args.observation, ask_human=args.human)
 

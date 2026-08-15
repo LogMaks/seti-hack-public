@@ -15,15 +15,14 @@
     <div class="brand-block">
       <p class="eyebrow">Desk notes · unclassified</p>
       <h1 class="brand brand-sm">ARRAY-7</h1>
-      <p class="tagline">Participant briefings — canon, teams, DST</p>
+      <p class="tagline">Participant briefings — canon, detectors, DST</p>
     </div>
     <a class="btn btn-ghost" href="index.html">Terminal</a>
   </header>
 
   <nav class="doc-nav" aria-label="Briefings">
     <a href="#intro" data-tab="intro">Intro</a>
-    <a href="#team-a" data-tab="team-a">Team A</a>
-    <a href="#team-b" data-tab="team-b">Team B</a>
+    <a href="#detectors" data-tab="detectors">Detectors</a>
     <a href="#dst" data-tab="dst">DST</a>
     <a href="briefing.html">Hall deck</a>
   </nav>
@@ -32,8 +31,9 @@
     <article id="intro">
       <h2>SETI / DST Hack</h2>
       <p>Два слоя. Сдают оба по желанию, <strong>обязателен только первый</strong>.</p>
-      <p><strong>1. Основное — легко.</strong> Это сигнал или шум? Команда A — спектр, команда B — структура. Числа сливают через Dempster–Shafer. Решают <strong>сами команды</strong>. Внешнего судьи нет.</p>
+      <p><strong>1. Основное — легко.</strong> Это сигнал или шум? Шесть детекторов снимают evidence. Числа сливают через Dempster–Shafer. Решает <strong>сама команда</strong>. Внешнего судьи нет.</p>
       <p><strong>2. Бонус — зашифрованный текст.</strong> В потоке может быть закодированный фрагмент. Найти и прочитать — плюс, не замена baseline. Где лежит и как закодировано — часть задачи, подсказок нет.</p>
+      <p class="muted">На живом хаке соревнуются две группы. Kit один: одна команда в коде, шесть источников.</p>
       <h3>Откуда данные</h3>
       <p>Станция показывает waveform и отдаёт <code>.npy</code>. Анализ — только в <code>participant/</code>. Сайт ничего не классифицирует.</p>
       <pre>cd participant
@@ -41,68 +41,47 @@ python main.py data/obs_s0.npy</pre>
       <p class="muted">Порядок раундов задаёт организатор, не алфавит ID.</p>
       <h3>Канон сдачи</h3>
       <ol>
-        <li>Team A и Team B независимо получают BPA.</li>
-        <li>Внутри команды — среднее BPA (<code>mean</code>, это не DST).</li>
-        <li><strong>Канон:</strong> Dempster на двух team means (A vs B).</li>
+        <li>Шесть детекторов независимо получают BPA.</li>
+        <li><strong>Канон:</strong> Dempster на всех шести BPA.</li>
         <li>majority и mean рядом — чтобы сравнить, не заменить DST.</li>
-        <li>Все 6 детекторов — диагностика, не сдача.</li>
       </ol>
-      <p>Сдавать по раунду: BPA или team means; majority / mean / DST; Bel, Pl, K, m(Θ); действие политики; вердикт команд; 3–5 предложений «почему». Бонус отдельно: если нашли текст — что прочитали и как.</p>
+      <p>Сдавать по раунду: BPA шести детекторов; majority / mean / DST; Bel, Pl, K, m(Θ); действие политики; вердикт команды; 3–5 предложений «почему». Бонус отдельно: если нашли текст — что прочитали и как.</p>
       <h3>Политика</h3>
       <table>
         <thead><tr><th>Действие</th><th>Смысл</th></tr></thead>
         <tbody>
           <tr><td><code>DECIDE</code></td><td>baseline предлагает метку — команда может согласиться</td></tr>
-          <tr><td><code>HUMAN_REVIEW</code></td><td>спор A vs B: высокий K или большое m(Θ); автомат не решает, команды пишут вердикт. При K→1 комбинация отказана, не «упала»</td></tr>
+          <tr><td><code>HUMAN_REVIEW</code></td><td>высокий K или большое m(Θ); автомат не решает, команда пишет вердикт. При K→1 комбинация отказана, не «упала»</td></tr>
           <tr><td><code>OBSERVE_MORE</code></td><td>слабо / ничья — ждать следующий раунд, отдельного API нет</td></tr>
         </tbody>
       </table>
       <p>Пороги в <code>decision.py</code> можно менять — выбор нужно защитить. ИИ разрешён. Метод нужно понимать. ИИ — не ground truth.</p>
     </article>
 
-    <article id="team-a">
-      <h2>Team A — спектр</h2>
-      <p>Вопрос: <strong>есть ли физически выделяемый сигнал</strong> (против noise-like спектра)?</p>
-      <p>Код: <code>detectors_a.py</code> → <code>run_team_a(x, fs)</code> → список BPA.</p>
+    <article id="detectors">
+      <h2>Шесть детекторов</h2>
+      <p>Одна команда, шесть независимых источников evidence. Код: <code>detectors.py</code> → <code>run_detectors(x, fs)</code> → список BPA.</p>
       <table>
         <thead><tr><th>Детектор</th><th>Идея</th></tr></thead>
         <tbody>
           <tr><td><code>snr</code></td><td>пик PSD относительно медианы</td></tr>
           <tr><td><code>fft_peak</code></td><td>узкий пик в амплитудном спектре</td></tr>
           <tr><td><code>band_energy</code></td><td>доля энергии в top-k бинах</td></tr>
-        </tbody>
-      </table>
-      <p>BPA: <code>{"signal", "noise", "unknown"}</code>, сумма 1. <code>unknown</code> = m(Θ), не третий класс.</p>
-      <h3>Можно менять</h3>
-      <p>Пороги, окна, бины, score→BPA. Новый признак — только если объясняете.</p>
-      <p>Нельзя: подглядывать метки, вводить третью гипотезу в Θ без решения всей команды, сдавать график без BPA.</p>
-      <ul>
-        <li>Высокая энергия ≠ автоматически <code>signal</code>.</li>
-        <li>Низкая уверенность → масса на <code>unknown</code>, не «натянуть 0.99».</li>
-        <li>Согласие трёх детекторов A — ещё не ответ: канон — DST между командами.</li>
-      </ul>
-    </article>
-
-    <article id="team-b">
-      <h2>Team B — структура</h2>
-      <p>Вопрос: <strong>есть ли неслучайная структура</strong> в наблюдении?</p>
-      <p>Код: <code>detectors_b.py</code> → <code>run_team_b(x, fs)</code> → список BPA.</p>
-      <table>
-        <thead><tr><th>Детектор</th><th>Идея</th></tr></thead>
-        <tbody>
           <tr><td><code>autocorr</code></td><td>сильный пик автокорреляции при ненулевом лаге</td></tr>
           <tr><td><code>entropy</code></td><td>ниже энтропия амплитуд, чем у шума → больше структуры</td></tr>
           <tr><td><code>periodicity</code></td><td>повтор / модуляция через спектр квадрата</td></tr>
         </tbody>
       </table>
       <p>BPA: <code>{"signal", "noise", "unknown"}</code>, сумма 1. <code>unknown</code> = m(Θ), не третий класс.</p>
+      <p>Первые три смотрят спектр/энергию, последние три — структуру. Это разные вопросы, не разные команды.</p>
       <h3>Можно менять</h3>
-      <p>Лаги, бины, пороги, score→BPA. Новый признак — только если объясняете, что он меряет.</p>
-      <p>Нельзя: искать «скрытое сообщение» <em>вместо</em> BPA (текст — бонус после сдачи); подгонять ответ под Team A, пока не посчитали свой набор.</p>
+      <p>Пороги, окна, лаги, бины, score→BPA. Новый признак — только если объясняете.</p>
+      <p>Нельзя: подглядывать метки, вводить третью гипотезу в Θ, сдавать график без BPA, искать «скрытое сообщение» <em>вместо</em> BPA (текст — бонус после сдачи).</p>
       <ul>
-        <li>A смотрит «выделяется ли», B — «не случайно ли».</li>
-        <li>Конфликт A vs B — учебный кейс: majority может быть спокоен, DST поднимает K.</li>
-        <li>Канон — DST на team mean A против team mean B, не голосование шести детекторов.</li>
+        <li>Высокая энергия ≠ автоматически <code>signal</code>.</li>
+        <li>Низкая уверенность → масса на <code>unknown</code>, не «натянуть 0.99».</li>
+        <li>Согласие части детекторов — ещё не ответ: канон — DST на всех шести.</li>
+        <li>Конфликт между детекторами — учебный кейс: majority может быть спокоен, DST поднимает K.</li>
       </ul>
     </article>
 
@@ -126,27 +105,27 @@ python main.py data/obs_s0.npy</pre>
       <table>
         <thead><tr><th></th><th>signal</th><th>noise</th><th>unknown</th></tr></thead>
         <tbody>
-          <tr><td>A</td><td>0.60</td><td>0.10</td><td>0.30</td></tr>
-          <tr><td>B</td><td>0.50</td><td>0.10</td><td>0.40</td></tr>
+          <tr><td>m1</td><td>0.60</td><td>0.10</td><td>0.30</td></tr>
+          <tr><td>m2</td><td>0.50</td><td>0.10</td><td>0.40</td></tr>
           <tr><td>mean</td><td>0.55</td><td>0.10</td><td>0.35</td></tr>
           <tr><td>DST, K=0.11</td><td><strong>0.78</strong></td><td>0.09</td><td>0.13</td></tr>
         </tbody>
       </table>
       <h3>Пример 2 — конфликт</h3>
-      <p>A за signal, B за noise. Majority и mean спокойны (ничья). DST поднимает K.</p>
+      <p>Один за signal, другой за noise. Majority и mean спокойны (ничья). DST поднимает K.</p>
       <table>
         <thead><tr><th></th><th>signal</th><th>noise</th><th>unknown</th></tr></thead>
         <tbody>
-          <tr><td>A</td><td>0.70</td><td>0.10</td><td>0.20</td></tr>
-          <tr><td>B</td><td>0.10</td><td>0.70</td><td>0.20</td></tr>
+          <tr><td>m1</td><td>0.70</td><td>0.10</td><td>0.20</td></tr>
+          <tr><td>m2</td><td>0.10</td><td>0.70</td><td>0.20</td></tr>
           <tr><td>mean</td><td>0.40</td><td>0.40</td><td>0.20</td></tr>
           <tr><td>DST, K=0.50</td><td>0.46</td><td>0.46</td><td>0.08</td></tr>
         </tbody>
       </table>
-      <p>Majority → abstain. K=0.50 ≥ 0.25 → <code>HUMAN_REVIEW</code>: автомат не ставит метку, вердикт пишут команды. Если A=<code>(1,0,0)</code> и B=<code>(0,1,0)</code>, K→1: комбинация отказана — тот же спор A vs B.</p>
+      <p>Majority → abstain. K=0.50 ≥ 0.25 → <code>HUMAN_REVIEW</code>: автомат не ставит метку, вердикт пишет команда. Если m1=<code>(1,0,0)</code> и m2=<code>(0,1,0)</code>, K→1: комбинация отказана — тот же <code>HUMAN_REVIEW</code>.</p>
       <h3>Конфликт</h3>
       <p>K = m1(signal)·m2(noise) + m1(noise)·m2(signal).</p>
-      <p>Если K → 1, комбинация не определена. Код не падает: политика → <code>HUMAN_REVIEW</code> (спор команд). Это не «положить конфликт в unknown».</p>
+      <p>Если K → 1, комбинация не определена. Код не падает: политика → <code>HUMAN_REVIEW</code>. Это не «положить конфликт в unknown».</p>
       <p><code>max_conflict</code> — максимум <strong>последовательных</strong> pairwise K. Порядок источников влияет на число. Учебный прокси, не инвариант n источников.</p>
       <h3>Три baseline</h3>
       <ol>
@@ -155,8 +134,8 @@ python main.py data/obs_s0.npy</pre>
         <li><strong>DST</strong> — Dempster</li>
       </ol>
       <p>Имеет смысл искать файл, где majority/mean спокойны, а DST поднимает K. Такое бывает не на каждом наблюдении.</p>
-      <p>Канон: mean внутри A и внутри B, затем Dempster <strong>A vs B</strong>. Все 6 детекторов — диагностика.</p>
-      <p>Высокий K или большое m(Θ) → <code>HUMAN_REVIEW</code> (команды спорят). Слабый Bel или ничья → <code>OBSERVE_MORE</code> (ждать раунд). Иначе <code>DECIDE</code>.</p>
+      <p>Канон: Dempster на <strong>всех шести</strong> детекторах.</p>
+      <p>Высокий K или большое m(Θ) → <code>HUMAN_REVIEW</code> (команда пишет вердикт). Слабый Bel или ничья → <code>OBSERVE_MORE</code> (ждать раунд). Иначе <code>DECIDE</code>.</p>
     </article>
   </main>
 
